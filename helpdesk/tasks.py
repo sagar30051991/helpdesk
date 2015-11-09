@@ -6,7 +6,7 @@ def sync_db():
         Sync Data from MS-SQL database to MariaDB
     """
     try:
-        from helpdesk.helpdesk.doctype.mssql_configuration import get_mssql_config
+        from helpdesk.helpdesk.doctype.mssql_configuration.mssql_configuration import get_mssql_config
 
         config = get_mssql_config()
         server = config.get("server")
