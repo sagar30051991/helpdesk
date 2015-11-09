@@ -6,7 +6,7 @@ def get_data():
 	return {
 		"HelpDesk": {
 			"color": "grey",
-			"icon": "octicon octicon-file-directory",
+			"icon": "octicon octicon-briefcase",
 			"type": "module",
 			"label": _("HelpDesk")
 		}

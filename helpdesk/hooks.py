@@ -5,7 +5,7 @@ app_name = "helpdesk"
 app_title = "HelpDesk"
 app_publisher = "helpdesk"
 app_description = "helpdesk"
-app_icon = "octicon octicon-file-directory"
+app_icon = "octicon octicon-briefcase"
 app_color = "grey"
 app_email = "makarand.b@indictranstech.com"
 app_version = "0.0.1"
@@ -77,23 +77,23 @@ app_version = "0.0.1"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"helpdesk.tasks.all"
-# 	],
-# 	"daily": [
-# 		"helpdesk.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"helpdesk.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"helpdesk.tasks.weekly"
-# 	]
-# 	"monthly": [
-# 		"helpdesk.tasks.monthly"
-# 	]
-# }
+scheduler_events = {
+	"all": [
+		"helpdesk.tasks.sync_db"
+	]
+	# "daily": [
+	# 	"helpdesk.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"helpdesk.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"helpdesk.tasks.weekly"
+	# ]
+	# "monthly": [
+	# 	"helpdesk.tasks.monthly"
+	# ]
+}
 
 # Testing
 # -------
@@ -106,4 +106,3 @@ app_version = "0.0.1"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "helpdesk.event.get_events"
 # }
-
