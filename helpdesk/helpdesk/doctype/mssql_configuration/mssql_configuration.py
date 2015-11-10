@@ -15,5 +15,6 @@ def get_mssql_config():
         "server": config.server,
         "port": config.port,
         "user": config.user,
-        "password": config.password
+        "password": config.password,
+        "database": config.database
     }
