@@ -16,7 +16,8 @@ from werkzeug.wrappers import Response
 from werkzeug.exceptions import NotFound, Forbidden
 # from utils import json_to_xml
 
-def report_error(message,status_code=0):
+def get_response(message,status_code=0):
+	# status_code 0 for error, 1 for successful execution
 	frappe.response["code"] = status_code
 	frappe.response["message"] = message
 	response = build_response("json")

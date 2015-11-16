@@ -1,5 +1,5 @@
 import frappe
-from response import report_error
+from response import get_response
 from utils import get_json_request
 from utils import get_attr
 
@@ -24,7 +24,7 @@ def validate_url():
 	if call=="method" and len(parts) == 3:
 		try:
 			cmd = "helpdesk.helpdesk_api.{0}".format(cmd)
-			method = method = get_attr(cmd)
+			method = get_attr(cmd)
 			frappe.local.form_dict.cmd = cmd
 		except Exception, e:
 			raise Exception("Invalid API-URL")

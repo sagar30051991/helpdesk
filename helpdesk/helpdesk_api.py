@@ -1,20 +1,50 @@
 import frappe
-from response import report_error
 
 def reportIssue(args):
-	return report_error("Not Yet Implemented")
+	result = False
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result
 
 def getIssueStatus(args):
-	return report_error("Not Yet Implemented")
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result
 
 def getList(args):
-	return report_error("Not Yet Implemented")
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result
 
 def updateIssue(args):
-	return report_error("Not Yet Implemented")
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result
 
 def deleteIssue(args):
-	return report_error("Not Yet Implemented")
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result
 
 def getIssueHistory(args):
-	return report_error("Not Yet Implemented")
+	try:
+		result = True
+	except Exception, e:
+		raise Exception("Not Yet Implemented")
+	finally:
+		return result

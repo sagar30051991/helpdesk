@@ -15,4 +15,4 @@ def handle():
 		validate_request()
 		return handler.handle()
 	except Exception, e:
-		return report_error(0, str(e))
+		return get_response(0, str(e))
