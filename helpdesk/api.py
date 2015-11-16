@@ -1,6 +1,6 @@
 import frappe
 import handler
-from response import report_error
+from response import get_response
 from validate import validate_request
 
 def handle():
