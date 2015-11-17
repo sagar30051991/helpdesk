@@ -1,0 +1,22 @@
+{
+ "content": null, 
+ "creation": "2015-11-17 11:44:48.630323", 
+ "docstatus": 0, 
+ "doctype": "Page", 
+ "icon": "octicon octicon-briefcase", 
+ "modified": "2015-11-17 11:45:06.167359", 
+ "modified_by": "Administrator", 
+ "module": "HelpDesk", 
+ "name": "dashboard", 
+ "owner": "Administrator", 
+ "page_name": "dashboard", 
+ "roles": [
+  {
+   "role": "Administrator"
+  }
+ ], 
+ "script": null, 
+ "standard": "Yes", 
+ "style": null, 
+ "title": "Helpdesk Dashboard"
+}
