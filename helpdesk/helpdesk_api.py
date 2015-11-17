@@ -1,5 +1,6 @@
 import frappe
 
+@frappe.whitelist()
 def reportIssue(args):
 	result = False
 	try:
@@ -9,6 +10,7 @@ def reportIssue(args):
 	finally:
 		return result
 
+@frappe.whitelist()
 def getIssueStatus(args):
 	try:
 		result = True
@@ -17,6 +19,7 @@ def getIssueStatus(args):
 	finally:
 		return result
 
+@frappe.whitelist()
 def getList(args):
 	try:
 		result = True
@@ -25,6 +28,7 @@ def getList(args):
 	finally:
 		return result
 
+@frappe.whitelist()
 def updateIssue(args):
 	try:
 		result = True
@@ -33,6 +37,7 @@ def updateIssue(args):
 	finally:
 		return result
 
+@frappe.whitelist()
 def deleteIssue(args):
 	try:
 		result = True
@@ -41,6 +46,7 @@ def deleteIssue(args):
 	finally:
 		return result
 
+@frappe.whitelist()
 def getIssueHistory(args):
 	try:
 		result = True
