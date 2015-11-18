@@ -90,13 +90,14 @@ api_request_schema = {
 			},
 			"filter": {
 				"type": dict,
-				"options": [
+				"allowed_field": [
 						"resolution_date", "user", "subject", 
 						"ticket_id", "department",
 						"status", "opening_date"
 					],
-				"default_option": "name",
-				"allowed_operations": ["Like", "In", "Not In", "!=", "=", ">", "<", ">=", "<="],
+				"default_field": "raised_by",
+				# TODO add like, not like op
+				"allowed_operations": ["IN", "NOT IN", "<>", "=", ">", "<", ">=", "<="],
 				"default_operation": "="
 			},
 			"order_by": {

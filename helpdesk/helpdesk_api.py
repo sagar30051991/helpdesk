@@ -53,9 +53,46 @@ def getIssueStatus(args):
 
 @frappe.whitelist()
 def getIssueList(args):
+	"""
+	sample request
+	{
+	  "code": 1,
+	  "order_by": "DESC",
+	  "sort_by": "name",
+	  "filter": {
+	    "field": "ticket_id",
+	    "operation": "=",
+	    "value": "10"
+	  },
+	  "limit": 20,
+	  "user": "makarand.b@indictranstech.com",
+	  "sid": "1beb53e98c7f2294d325f797cfe4d48e222b07d7ecc5b542d4ec1567",
+	}
+	"""
+	result = {}
 	try:
-		result = args
+		_fields = {
+			"condition":build_condition(args.get("filter")),
+			"fields": ",".join([
+							"creation", "opening_date", "owner", "raised_by", 
+							"first_responded_on", "modified_by", "opening_time",
+							"subject", "description", "department",
+							"resolution_details", "resolution_date", "name as ticket_id",
+							"modified"
+						])
+		}
+		print "_fields", _fields
+		args.update(_fields)
+		query = """ SELECT %(fields)s FROM `tabIssue` WHERE %(condition)s ORDER BY 
+					%(sort_by)s %(order_by)s LIMIT %(limit)s"""%(args)
+		issues = frappe.db.sql(query, as_dict=True, debug=True)
+		result = {
+			"total_records": len(issues),
+			# "Issues":[issue for issue in issues]
+			"issues": issues
+		}
 	except Exception, e:
+		print e
 		raise Exception("Not Yet Implemented")
 	finally:
 		return result
@@ -98,3 +135,15 @@ def set_values(issue, args):
 	issue.subject = args.get("subject")
 	issue.description = args.get("description")
 	issue.department = args.get("department")
+
+def build_condition(filters):
+	if filters == "default_filter":
+		return ""
+	else:
+		field = filters.get("field") if filters.get("field") != "ticket_id" else "name"
+		val = filters.get("value")
+		op = filters.get("operation")
+		if op in ["NOT IN", "IN"]:
+			return "{0} {1} ({2})".format(field, op, ",".join(["'%s'"%(v) for v in val]))
+		else:
+			return "{0}{1}'{2}'".format(field, op, val)

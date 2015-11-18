@@ -4,6 +4,7 @@ from response import get_response
 from utils import get_json_request
 from utils import get_attr
 from conf import api_request_schema as schema
+from utils import is_valid_datetime
 
 def validate_request():
 	validate_url()
@@ -128,7 +129,6 @@ def validate_get_list_request(args):
 		raise Exception("User don't have permissions to access the ticket".format(args.get("ticket_id")))
 
 	fields_dict = schema.get("getIssueList").get("fields")
-	# validate filters parameters
 	validate_filters_parameter(fields_dict, args)
 	validate_sort_by_parameter(fields_dict, args)
 	validate_order_by_parameter(fields_dict, args)
@@ -250,14 +250,53 @@ def validate_sort_by_parameter(fields_dict, args):
 
 def validate_filters_parameter(fields_dict, args):
 	"""validate filters parameter"""
-	_filter = fields_dict.get("filter")
-	if not args.get("filter"):
+	_filter_sch = fields_dict.get("filter")
+	_filter = args.get("filter")
+	if not _filter:
 		default_filter = {
-			"field":_filter.get("default_option"),
-			"operation": _filter.get("default_operation"),
-			"value": "*"
+			"field":_filter_sch.get("default_field"),
+			"operation": _filter_sch.get("default_operation"),
+			"value": args.get("user")
 		}
 		args.update({"filter":default_filter})
+	elif [key for key in _filter.keys() if key not in ["field", "operation", "value"]]:
+		raise Exception("Invalid filter format")
+	elif _filter.get("field") not in _filter_sch.get("allowed_field"):
+		raise Exception("Invalid field, field should be one of following [{0}]".format(",".join(_filter_sch.get("allowed_field"))))
+	elif _filter.get("operation") not in _filter_sch.get("allowed_operations"):
+		raise Exception("Invalid operation, operation should be one of following [{0}]".format(",".join(_filter_sch.get("allowed_operations"))))
+	elif not _filter.get("value"):
+		raise Exception("Value field is missing in filter")
+	elif not (isinstance(_filter.get("value"), basestring) or isinstance(_filter.get("value"), list)):
+		raise Exception("Invalid type for value field")
+
+	if _filter: is_valid_field_and_operation_combo(_filter_sch, _filter)
+
+def is_valid_field_and_operation_combo(fields_dict, _filter):
+	# TODO add like
+	op = _filter.get("operation")
+	field = _filter.get("field")
+	val = _filter.get("value")
+	date_format = "%Y-%m-%d %H:%M:%S"
+
+	if op in ["IN", "NOT IN"] and not isinstance(val, list):
+		raise Exception("For {0} operation type of value field must be List".format(op))
+	elif op not in ["IN", "NOT IN"] and not isinstance(val, basestring):
+		raise Exception("For {0} operation type of value field must be String".format(op))
+
+	if field in ["resolution_date", "opening_date"]:
+		if op in ["IN", "NOT IN"]:
+			for v in val:
+				is_valid_datetime(v, date_format)
+		else:
+			is_valid_datetime(val, date_format)
+	else:
+		if op in ["IN", "NOT IN"]:
+			for v in val:
+				if not isinstance(v, basestring):
+					raise Exception("Value field in the filter should contain the list of string elements")
+		if op in [">", "<", ">=", "<="]:
+			raise Exception("{0} operation can not be used on '{1}' field".format(op, field))
 
 def validate_user_against_session_id(args):
 	sid = args.get("sid")
