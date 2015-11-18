@@ -25,4 +25,17 @@ def get_data():
 				},
 			]
 		},
+		{
+			"label": _("Page"),
+			"icon": "icon-cog",
+			"items": [
+				{
+					"type": "page",
+					"name": "dashboard",
+					"icon": "icon-sitemap",
+					"label": _("Helpdesk Dashboard"),
+					"description": _("Dashboard for Helpdesk"),
+				},
+			]
+		},
     ]
