@@ -1,3 +1,4 @@
+import json
 import frappe
 from response import get_response
 from utils import get_json_request
@@ -6,9 +7,10 @@ from conf import api_request_schema as schema
 
 def validate_request():
 	validate_url()
-
+	
 	args  = get_json_request(frappe.local.form_dict.args)
-	method = frappe.local.form_dict.cmd
+	cmd = frappe.local.form_dict.cmd
+	method = cmd.split(".")[2] if cmd != "login" else cmd
 
 	validate_request_parameters(method, args)
 	if method != "login": validate_user_against_session_id(args)
@@ -42,45 +44,13 @@ def validate_request_parameters(method, args):
 	validate_request_methods[method](args)
 
 def validate_request_fields(method, args):
-	"""validate request fields for all the mandetory, length and type"""
+	"""validate all the request fields for mandetory, length and type"""
 	fields_dict = schema.get(method)
 	if not fields_dict:
 		raise Exception("Field schema is missing, Please contact Administrator")
 	else:
-		# validate_mandatory_fields(fields_dict, args)
-		validate_fields_length(fields_dict, args)
-		validate_fields_type(fields_dict, args)
-
-def validate_user_against_session_id(args):
-	sid = args.get("sid")
-	user = args.get("user")
-
-	if not user:
-		raise Exception("user field is missing")
-	elif user != frappe.db.get_value("Sessions", {"sid":sid}, "user"):
-		raise Exception("Invalid User")
-
-def validate_login_request(args):
-	# raise Exception("not yet implemented")
-	pass
-
-def validate_report_issue_request(args):
-	raise Exception("not yet implemented")
-
-def validate_get_issue_status_request(args):
-	raise Exception("not yet implemented")
-
-def validate_get_list_request(args):
-	raise Exception("not yet implemented")
-
-def validate_update_issue_request(args):
-	raise Exception("not yet implemented")
-
-def validate_delete_issue_request(args):
-	raise Exception("not yet implemented")
-
-def validate_issue_history_request(args):
-	raise Exception("not yet implemented")
+		validate_mandatory_fields(fields_dict, args)
+		validate_fields_length_and_type(fields_dict, args)
 
 def validate_mandatory_fields(fields_dict, args):
 	# check the request for missing/mandatory or for extra fields
@@ -102,36 +72,208 @@ def validate_mandatory_fields(fields_dict, args):
 		raise Exception("Request contains following extra_fields : {0}".format(",".join(extra_fields)))
 
 def validate_fields_length_and_type(fields_dict, args):
-	all_felds = fields_dict.get("fields")
-	if not all_felds:
+	all_fields = fields_dict.get("fields")
+	if not all_fields:
 		raise Exception("Field schema is missing, Please contact Administrator")
 	else:
 		invalid_fields = []
 		len_exceeded = []
-		for field, prop in all_felds.iteritems():
-			if len(args.get(field)) > prop.get("length"):
+		for field, prop in all_fields.iteritems():
+			# check the field length
+			if prop.get("length") and isinstance(args.get(field), basestring) and len(args.get(field)) > prop.get("length"):
 				len_exceeded.append("'%s'"%(field))
-			# elif type(args.get(field)) != type(str):
-			# 	invalid_fields.append(field)
+
+			# check the field type
+			if not isinstance(args.get(field), prop.get("type")):
+				invalid_fields.append(field)
 
 		if len_exceeded:
 			raise Exception(
 					"Request parameters length exceeded for following field(s) : {0}".format(",".join(len_exceeded))
 					)
 
-def validate_fields_type(fields_dict, args):
-	all_felds = fields_dict.get("fields")
-	if not all_felds:
-		raise Exception("Field schema is missing, Please contact Administrator")
+def validate_login_request(args):
+	# raise Exception("not yet implemented")
+	pass
+
+def validate_report_issue_request(args):
+	# raise Exception("not yet implemented")
+	try:
+		issue = is_issue_already_exists(args)
+		if not issue:
+			is_valid_user(args.get("user"))
+			is_valid_department(args.get("department"))
+			if not check_user_permission(args, ptype="create"):
+				raise Exception("User don't have permissions to create the ticket".format(args.get("ticket_id")))
+		else: 
+			raise Exception("Similer Issue is already Created by the user, Please check Issue : {0}".format(",".join(issue)))
+	except Exception, e:
+		raise e
+
+def validate_get_issue_status_request(args):
+	# raise Exception("not yet implemented")
+	try:
+		if not does_issue_exists(args.get("ticket_id")):
+			raise Exception("{0} Support Ticket Does Not Exists".format(args.get("ticket_id")))
+		else:
+			# ticket exists check if user is the owner of ticket or allowed to access the issue
+			if not check_user_permission(args):
+				raise Exception("User don't have permissions to access the ticket".format(args.get("ticket_id")))
+	except Exception, e:
+		raise e
+
+def validate_get_list_request(args):
+	# raise Exception("not yet implemented")
+	if not check_user_permission(args):
+		raise Exception("User don't have permissions to access the ticket".format(args.get("ticket_id")))
+
+	fields_dict = schema.get("getIssueList").get("fields")
+	# validate filters parameters
+	validate_filters_parameter(fields_dict, args)
+	validate_sort_by_parameter(fields_dict, args)
+	validate_order_by_parameter(fields_dict, args)
+	validate_limit_parameter(fields_dict, args)
+
+	frappe.local.form_dict.args = json.dumps(args)
+
+def validate_update_issue_request(args):
+	# raise Exception("not yet implemented")
+	try:
+		if not does_issue_exists(args.get("ticket_id")):
+			raise Exception("{0} Support Ticket Does Not Exists".format(args.get("ticket_id")))
+		else:
+			# check if request contains any other fields other than sid & user
+			if not [key for key in args.keys() if key not in ["user", "sid", "ticket_id"]]:
+				raise Exception("Nothing to update")
+			else:
+				# only admin should be able to change the department
+				dept = args.get("department")
+				if dept and dept != frappe.db.get_value("Issue", args.get("ticket_id"), "department"):
+					if args.get("user") != "Administrator":
+						raise Exception("Only Administrator is allowed to update the department")
+
+				# check if user is assigned_to user
+				if frappe.db.get_value("Issue", args.get("ticket_id"), "owner") != args.get("user"):
+					user = frappe.db.get_value(
+							"ToDo",
+							{
+								"reference_type": "Issue",
+								"reference_name": args.get("ticket_id"),
+								"owner": args.get("user")
+							},
+							"owner"
+						)
+					if not user and user != args.get("user"):
+						raise Exception("User don't have permissions to update the support ticket")
+	except Exception, e:
+		raise e
+
+def validate_delete_issue_request(args):
+	raise Exception("not yet implemented")
+
+def validate_issue_history_request(args):
+	raise Exception("not yet implemented")
+
+def is_valid_user(email):
+	user = frappe.db.get_value("User", {"email":email}, ["email","enabled", "first_name"], as_dict=True)
+	if not user and user.get("email") == email:
+		raise Exception("Invalid email id")
+	elif not user.get("enabled"):
+		raise Exception("{0}'s Profile has been disabled, Please contact Administrator".format(user.get("first_name")))
+	# TODO check if support user ??
 	else:
-		invalid_fields = []
+		# valid user
+		return True
+
+def is_valid_department(department):
+	if not frappe.db.get_value("Department", department, "name") == department:
+		raise Exception("Invalid Department")
+	else:
+		return True
+
+def is_issue_already_exists(args):
+	query = """ SELECT DISTINCT name FROM tabIssue WHERE raised_by='%s' AND status='Open'
+				AND subject='%s' AND department='%s'"""%(
+					args.get("user"),
+					args.get("subject"),
+					args.get("department")
+				)
+	issue = frappe.db.sql(query, as_list=True)
+	if issue:
+		return [i[0] for i in issue]
+
+def does_issue_exists(issue):
+	if not frappe.db.get_value("Issue", issue, "name"):
+		return False
+	else:
+		return True
+
+def check_user_permission(args, ptype="read"):
+	issue = args.get("ticket_id")
+	user = args.get("user")
+	# check if user is owner or not
+	if frappe.db.get_value("Issue", issue, "owner") != user:
+		# check if user have permissions to read issue
+		if not frappe.has_permission("Issue", ptype=ptype, user=user):
+			return False
+		else:
+			return True
+	else:
+		return True
+
+def validate_limit_parameter(fields_dict, args):
+	"""validate limit parameter"""
+	
+	limit = fields_dict.get("limit")
+	if not args.get("limit"):
+		args.update({"limit":limit.get("default")})
+	elif args.get("limit") > limit.get("max_value"):
+		raise Exception("Max value for limit parameter is {0}".format(limit.get("max_value")))
+	elif args.get("limit") <= 0:
+		raise Exception("Invalid limit parameter value")
+
+def validate_order_by_parameter(fields_dict, args):
+	"""validate order by parameter"""
+	order_by = fields_dict.get("order_by")
+	if not args.get("order_by"):
+		args.update({"order_by":order_by.get("default")})
+	elif args.get("order_by") not in order_by.get("options"):
+		raise Exception("Invalid order by value, value should either {0}".format(" or ".join(order_by.get("options"))))
+
+def validate_sort_by_parameter(fields_dict, args):
+	"""validate sort by parameter"""
+	sort_by = fields_dict.get("sort_by")
+	if not args.get("sort_by"):
+		args.update({"sort_by":sort_by.get("default")})
+	elif args.get("sort_by") not in sort_by.get("options"):
+		raise Exception("Invalid order by value, value should one of the following [{0}]".format(",".join(sort_by.get("options"))))
+
+def validate_filters_parameter(fields_dict, args):
+	"""validate filters parameter"""
+	_filter = fields_dict.get("filter")
+	if not args.get("filter"):
+		default_filter = {
+			"field":_filter.get("default_option"),
+			"operation": _filter.get("default_operation"),
+			"value": "*"
+		}
+		args.update({"filter":default_filter})
+
+def validate_user_against_session_id(args):
+	sid = args.get("sid")
+	user = args.get("user")
+
+	if not user:
+		raise Exception("user field is missing")
+	elif user != frappe.db.get_value("Sessions", {"sid":sid}, "user"):
+		raise Exception("Invalid User")
 
 validate_request_methods = {
 	"login": validate_login_request,
 	"reportIssue": validate_report_issue_request,
-	"getIssueStatus": validate_get_issue_status_request,
-	"getList": validate_get_list_request,
 	"updateIssue": validate_update_issue_request,
 	"deleteIssue": validate_delete_issue_request,
+	"getIssueList": validate_get_list_request,
+	"getIssueStatus": validate_get_issue_status_request,
 	"getIssueHistory": validate_issue_history_request
 }

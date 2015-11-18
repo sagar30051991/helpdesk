@@ -15,4 +15,6 @@ def handle():
 		validate_request()
 		return handler.handle()
 	except Exception, e:
+		import traceback
+		print traceback.format_exc()
 		return get_response(0, str(e))
