@@ -12,6 +12,16 @@ def get_data():
 					"name": "Issue",
 					"description": _("Support queries from employees."),
 				},
+				{
+					"type": "doctype",
+					"name": "Ticket Escalation",
+					"description": _("Support Ticket Escalation Master."),
+				},
+				{
+					"type": "doctype",
+					"name": "Priority",
+					"description": _("Support Ticket Priority."),
+				},
             ]
         },
         {
