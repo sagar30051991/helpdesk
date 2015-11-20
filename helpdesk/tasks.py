@@ -29,3 +29,9 @@ def sync_db():
         # create scheduler log
         print e
         pass
+
+def ticket_escallation():
+    """
+        Escalate Pending Support Tickets to higher authority
+    """
+    pass
