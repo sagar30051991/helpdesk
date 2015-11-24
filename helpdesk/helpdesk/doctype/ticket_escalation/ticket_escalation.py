@@ -23,3 +23,4 @@ class TicketEscalation(Document):
 	def validate_escalation_records(self):
 		if not self.escalation_hierarchy:
 			frappe.throw("Escalation Hierarchy records are missing")
+			

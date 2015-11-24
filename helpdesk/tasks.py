@@ -34,4 +34,5 @@ def ticket_escallation():
     """
         Escalate Pending Support Tickets to higher authority
     """
+    query = """ SELECT * FROM tabIssue WHERE """
     pass

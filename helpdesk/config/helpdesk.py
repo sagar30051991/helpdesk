@@ -22,6 +22,11 @@ def get_data():
 					"name": "Priority",
 					"description": _("Support Ticket Priority."),
 				},
+				{
+					"type": "doctype",
+					"name": "Ticket Escalation History",
+					"description": _("Support Ticket Escalation History.")
+				},
             ]
         },
         {
@@ -32,6 +37,11 @@ def get_data():
 					"type": "doctype",
 					"name": "MSSQL Configuration",
 					"description": _("Setup MS-SQL database server for support users.")
+				},
+				{
+					"type": "doctype",
+					"name": "Ticket Escalation Settings",
+					"description": _("Support Ticket Escalation Settings.")
 				},
 			]
 		},

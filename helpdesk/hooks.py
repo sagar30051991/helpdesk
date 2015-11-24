@@ -66,13 +66,16 @@ app_version = "0.0.1"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Issue": {
+		"on_update": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.issue_on_update",
+		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.issue_on_trash"
+	},
+	"ToDo": {
+		"on_update": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_update",
+		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_trash"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
