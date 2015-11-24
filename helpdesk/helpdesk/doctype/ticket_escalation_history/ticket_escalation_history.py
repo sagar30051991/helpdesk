@@ -3,8 +3,9 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
 from frappe.model.document import Document
+from frappe.utils import nowtime
+import frappe
 
 class TicketEscalationHistory(Document):
 	pass
@@ -49,7 +50,27 @@ def todo_on_update(doc, method):
 		esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.reference_name}, "name")
 		create_update_escalation_record(todo=doc, esc_name=esc_name)
 
-def create_update_escalation_record(todo=None, todo_name=None, esc_name=esc_name):
+def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	if not todo:
 		todo = frappe.get_doc("ToDo", todo_name)
+
+	esc = frappe.get_doc("Ticket Escalation History", esc_name)
+	rec_id = frappe.db.get_value("Escalation Record",{"parent":esc_name, "todo":todo.name},"name")
+
+	entry = None
+	if not rec_id:
+		# child entry not found create new entry
+		entry = esc.append('items', {})
+		entry.todo = todo.name
+	else:
+		# update child table record and update moodified date of the Ticket Escalation History
+		items = esc.items
+		entry = [ch for ch in items if ch.get("name") == rec_id][0]
 	
+	entry.assigned_by = todo.assigned_by
+	entry.assigned_to = todo.owner
+	entry.todo_status = todo.status
+	entry.due_date = todo.date
+	esc.is_assigned = 1
+	esc.assigned_on = nowtime()
+	esc.save(ignore_permissions=True)
