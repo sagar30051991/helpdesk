@@ -14,11 +14,6 @@ def get_data():
 				},
 				{
 					"type": "doctype",
-					"name": "Ticket Escalation",
-					"description": _("Support Ticket Escalation Master."),
-				},
-				{
-					"type": "doctype",
 					"name": "Priority",
 					"description": _("Support Ticket Priority."),
 				},

@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 from frappe.model.document import Document
-from frappe.utils import nowtime
+from frappe.utils import nowtime, get_datetime
 import frappe
 
 class TicketEscalationHistory(Document):
@@ -37,7 +37,9 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 	esc.status = issue_doc.status
 	esc.opening_date = issue_doc.opening_date
 	esc.opening_time = issue_doc.opening_time
-	if is_new: esc.assigned_on = issue_doc.opening_time
+	if is_new:
+		datetime_str = "{date} {time}".format(date=issue_doc.opening_date, time=issue_doc.opening_time)
+		esc.assigned_on = get_datetime(datetime_str)
 
 	esc.save(ignore_permissions=True)
 
@@ -72,5 +74,5 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	entry.todo_status = todo.status
 	entry.due_date = todo.date
 	esc.is_assigned = 1
-	esc.assigned_on = nowtime()
+	esc.assigned_on = get_datetime()
 	esc.save(ignore_permissions=True)
