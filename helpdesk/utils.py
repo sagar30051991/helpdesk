@@ -34,7 +34,7 @@ def send_mail(args, subject):
         template = email_templates.get(args.get("action"))
 
         args.update({
-        	"fullname": get_user_fullname(args.get("user"))
+        	"fullname": get_user_fullname(args.get("user")) or "Guest"
         })
 
         frappe.sendmail(recipients=args.get("email"), sender=sender, subject=subject,
@@ -46,6 +46,42 @@ def send_mail(args, subject):
         print "notify", traceback.format_exc()
         return False
  
+def build_table(data, has_header=True, is_horizontal=False):
+    """
+    build html table
+    inupt: data:dict
+    format: {
+                "head":["SR","HEADER1", "HEADET2"],
+                total: 5                            #total number of rows
+                1: [1, "col1", "col2"]              # first row
+                2: [2, "col1", "col2"]              # second row
+            }
+    """
+    # building table head
+    thead = ""
+    if has_header and not is_horizontal:
+        th = "".join(["<th>%s</th>"%(th) for th in data.get("head")])
+        thead = "<thead><tr align='center'>{th}</tr><thead>".format(th=th)
+
+    records = ""
+    order = data.get("order")
+    for idx in xrange(1, data.get("total") + 1):
+        if not is_horizontal:
+            td = "".join(["<td align='center'>%s</td>"%(td) for td in data.get(idx)])
+        else:
+            td = "".join(["<td style='padding:5px' align='%s'>%s</td>"%(
+                                "right" if i == 0 else "left",
+                                "<b>%s<b>"%(td) if i == 0 else td
+                            ) for i,td in enumerate(data.get(idx))])
+        tr = "<tr>%s</tr>"%(td)
+        records += tr
+
+    tbody = "<tbody>%s<tbody>"%(records)
+    table = """<table border="1px" style="border-collapse: collapse;">{thead}{tbody}</table>""".format(thead=thead or "", tbody=tbody)
+    
+    return table
+ 
 email_templates = {
-	"open_tickets": "templates/email/open_ticket_template.html"
+	"open_tickets": "templates/email/open_ticket_template.html",
+	"new_ticket": "templates/email/new_ticket_template.html"
 }

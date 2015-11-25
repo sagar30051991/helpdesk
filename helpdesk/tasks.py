@@ -23,7 +23,7 @@ def sync_db():
         else:
             with pymssql.connect(server, user, password, database) as cn:
                 with cn.cursor(as_dict) as cursor:
-                    query = ""
+                    query = "SELECT * FROM employee"
                     cursor.execute(query)
                     for row in cursor:
                         # save user details and roles
@@ -59,12 +59,12 @@ def ticket_escallation():
                 send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
         else:
             # escalate ticket to higher authority
-            # escalate_ticket()
-            pass
+            escalate_ticket(record)
 
 # idx, ticket id, subject, department, opening date, opening time
 def get_open_tickets_details(user, tkts_list):
     """get open tickets details"""
+    from utils import build_table
     args = {}
 
     tickets = {
@@ -75,7 +75,7 @@ def get_open_tickets_details(user, tkts_list):
     for tkt_id in tkts_list:
         doc = frappe.get_doc("Issue", tkt_id)
         tickets.update({
-            idx: [doc.name, doc.subject, doc.department, str(doc.opening_date), str(doc.opening_time)]
+            idx: [idx, doc.name, doc.subject, doc.department, str(doc.opening_date), str(doc.opening_time)]
         })
 
     args.update({
@@ -87,30 +87,5 @@ def get_open_tickets_details(user, tkts_list):
 
     return args
 
-def build_table(data):
-    """
-    build html table
-    inupt: data:dict
-    format: {
-                "head":["SR","HEADER1", "HEADET2"],
-                total: 5                            #total number of rows
-                1: [1, "col1", "col2"]              # first row
-                2: [2, "col1", "col2"]              # second row
-            }
-    """
-    # building table head
-    th = "".join(["<th>%s</th>"%(th) for th in data.get("head")])
-    thead = "<thead><tr align='center'>{th}</tr><thead>".format(th=th)
-    records = ""
-
-    order = data.get("order")
-    for idx in xrange(1, data.get("total") + 1):
-        td = "<td align='center' >%s</td>"%(idx)
-        td += "".join(["<td align='center'>%s</td>"%(td) for td in data.get(idx)])
-        tr = "<tr>%s</tr>"%(td)
-        records += tr
-
-    tbody = "<tbody>%s<tbody>"%(records)
-    table = """<table border="1px" style="border-collapse: collapse;">{thead}{tbody}</table>""".format(thead=thead, tbody=tbody)
-    
-    return table
+def escalate_ticket(record):
+    pass

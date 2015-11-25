@@ -15,6 +15,7 @@ def reportIssue(args):
 			"ticket_id":issue.name,
 			"display_msg": "Support Ticket Created Sucessfully" 
 		}
+		send_new_ticket_notification(issue)
 	except Exception, e:
 		raise Exception("Error while creating Support ticket")
 	finally:
@@ -147,3 +148,25 @@ def build_condition(filters):
 			return "{0} {1} ({2})".format(field, op, ",".join(["'%s'"%(v) for v in val]))
 		else:
 			return "{0}{1}'{2}'".format(field, op, val)
+
+def send_new_ticket_notification(doc):
+	from utils import send_mail, build_table
+
+	ticket = {
+		"total":6,
+		# "head": ["Ticket ID", "Department", "Opening Date", "Opening Time", "Subject", "Raised By"]
+		1:["Ticket ID", doc.name],
+		2:["Department", doc.department],
+		3:["Opening Date", doc.opening_date],
+		4:["Opeing Time", doc.opening_time],
+		5:["Subject", doc.subject],
+		6:["Raised By", doc.raised_by]
+	}
+	args = {
+		"email": doc.raised_by,
+		"user": doc.raised_by,
+		"issue": doc.name,
+        "action": "new_ticket",
+        "ticket_detail": build_table(ticket, is_horizontal=True)
+	}
+	send_mail(args, "[HelpDesk][New Ticket] HelpDesk Notifications")
