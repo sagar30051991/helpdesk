@@ -83,13 +83,13 @@ doc_events = {
 scheduler_events = {
 	"all": [
 		"helpdesk.tasks.sync_db"
-	]
+	],
 	# "daily": [
 	# 	"helpdesk.tasks.daily"
 	# ],
-	# "hourly": [
-	# 	"helpdesk.tasks.hourly"
-	# ],
+	"hourly": [
+		"helpdesk.tasks.ticket_escallation"
+	],
 	# "weekly": [
 	# 	"helpdesk.tasks.weekly"
 	# ]
