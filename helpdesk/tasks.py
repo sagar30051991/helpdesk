@@ -44,7 +44,7 @@ def ticket_escallation():
     if not records:
         return
     else:
-        not_assigned = []
+        open_tickets = []
 
         # get escalation settings records
         doctype = "Ticket Escalation Settings"
@@ -55,35 +55,45 @@ def ticket_escallation():
         
         esc_setting = frappe.get_doc(doctype, docname)
 
-        for record in records:
-            # check if ticket is assigned or not
-            if not record.get("is_assigned"):
-                # send reminder mail to administrator after certain intervals
-                opening_date = record.get("opening_date")
-                opening_time = record.get("opening_time")
-                datetime_str = "{date} {time}".format(date=opening_date, time=opening_time)
-                now = str(get_datetime().now())
+        assigned_tickets = [record for record in records if record.get("is_assigned")]
+        not_assigned_tickets = [record for record in records if not record.get("is_assigned")]
 
-                # checking the time limit for administrator
-                ch_entry = esc_setting.escalation_heirarchy
-                if not ch_entry:
-                    frappe.throw("Invalid Escalation Settings Records")
-                elif ch_entry[0].role != "Administrator":
-                    frappe.throw("First Entry should be for Administrator")
-                else:
-                    time = int(ch[0].time)
+        # for record in records:
+        #     # check if ticket is assigned or not
+        #     if not record.get("is_assigned"):
+        #         # send reminder mail to administrator after certain intervals
+        #         opening_date = record.get("opening_date")
+        #         opening_time = record.get("opening_time")
+        #         datetime_str = "{date} {time}".format(date=opening_date, time=opening_time)
+        #         now = str(get_datetime().now())
 
-                if time_diff_in_hours(now, datetime_str) >= time or 2:
-                    not_assigned.append(record.get("ticket_id"))
-                # notify administrator regarding open tickets
-                if not_assigned:
-                    args = get_open_tickets_details("Administrator", not_assigned)
-                    send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
-            else:
-                # escalate ticket to higher authority
-                escalate_ticket(record)
+        #         # checking the time limit for administrator
+        #         ch_entry = esc_setting.escalation_heirarchy
+        #         if not ch_entry:
+        #             frappe.throw("Invalid Escalation Settings Records")
+        #         elif ch_entry[0].role != "Administrator":
+        #             frappe.throw("First Entry should be for Administrator")
+        #         else:
+        #             time = int(ch[0].time)
 
-# idx, ticket id, subject, department, opening date, opening time
+        #         if time_diff_in_hours(now, datetime_str) >= time or 2:
+        #             not_assigned.append(record.get("ticket_id"))
+        #         # notify administrator regarding open tickets
+        #         if not_assigned:
+        #             args = get_open_tickets_details("Administrator", not_assigned)
+        #             send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
+        #     else:
+        #         # escalate ticket to higher authority
+        #         escalate_ticket(record)
+
+        open_tickets = check_for_open_support_tickets(not_assigned_tickets, esc_setting)
+
+        if open_tickets:
+            args = get_open_tickets_details("Administrator", open_tickets)
+            send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
+
+        check_and_escalate_assigned_tickets(assigned_tickets, esc_setting)
+
 def get_open_tickets_details(user, tkts_list):
     """get open tickets details"""
     from utils import build_table
@@ -109,5 +119,64 @@ def get_open_tickets_details(user, tkts_list):
 
     return args
 
+def check_for_open_support_tickets(records, esc_setting):
+    open_tickets = []
+    time = 0
+
+    for record in records:
+        opening_date = record.get("opening_date")
+        opening_time = record.get("opening_time")
+        datetime_str = "{date} {time}".format(date=opening_date, time=opening_time)
+        now = str(get_datetime().now())
+        
+        time = get_time_difference(esc_setting)
+        
+        if time_diff_in_hours(now, datetime_str) >= time or 2:
+            open_tickets.append(record.get("ticket_id"))
+
+    return open_tickets
+
+def check_and_escalate_assigned_tickets(records, esc_setting):
+    time = 0
+    rec_cant_be_escalate = []
+
+    for record in records:
+        datetime_str = record.get("assigned_on")
+        now = str(get_datetime().now())
+        time = get_time_difference(esc_setting)
+        
+        if time_diff_in_hours(now, datetime_str) >= time or 2:
+            ch_entry = esc_setting.escalation_heirarchy
+            if ch_entry[0].role == record.current_role:
+                rec_cant_be_escalate(record)
+            else:
+                escalate_ticket(record)
+
+    if rec_cant_be_escalate:
+        args = get_tickets_details_that_cant_be_escalate(rec_cant_be_escalate)
+        send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
+
+
+def get_time_difference(esc_setting):
+    # checking the time limit for administrator
+    ch_entry = esc_setting.escalation_heirarchy
+    if not ch_entry:
+        frappe.throw("Invalid Escalation Settings Records")
+    elif ch_entry[0].role != "Administrator":
+        frappe.throw("First Entry should be for Administrator")
+    else:
+        return int(ch[0].time)
+
 def escalate_ticket(record):
+    """
+        TODO Escalate ticket to higher authority
+        Check the 
+    """
+
+    pass
+
+def get_tickets_details_that_cant_be_escalate(records):
+    # args = {
+
+    # }
     pass

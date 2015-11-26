@@ -16,6 +16,7 @@ def issue_on_update(doc, method):
 	create_update_escalation_history(doc, esc_name=esc_name)
 
 def issue_on_trash(doc, method):
+	# TODO
 	print "on transh"
 
 
@@ -40,6 +41,8 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 	if is_new:
 		datetime_str = "{date} {time}".format(date=issue_doc.opening_date, time=issue_doc.opening_time)
 		esc.assigned_on = get_datetime(datetime_str)
+		esc.current_owner = "Administrator"
+		esc.current_role = "Administrator"
 
 	esc.save(ignore_permissions=True)
 
@@ -47,7 +50,7 @@ def todo_on_update(doc, method):
 	if not doc.reference_type and doc.reference_name:
 		return
 	elif doc.reference_type == "Issue" and not doc.reference_name:
-		frappe.throw("Please Select the reference name first")
+		frappe.throw("Please select the reference name first")
 	elif doc.reference_type == "Issue":
 		esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.reference_name}, "name")
 		create_update_escalation_record(todo=doc, esc_name=esc_name)
@@ -75,4 +78,10 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	entry.due_date = todo.date
 	esc.is_assigned = 1
 	esc.assigned_on = get_datetime()
+	esc.current_owner = todo.owner
+	esc.current_role = get_user_role(todo.owner)
 	esc.save(ignore_permissions=True)
+
+def get_user_role(user):
+	return "Support Team"
+	# TODO get role high priority role

@@ -73,7 +73,8 @@ doc_events = {
 	},
 	"ToDo": {
 		"on_update": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_update",
-		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_trash"
+		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_trash",
+		"autoname": "helpdesk.utils.autoname_todo"
 	}
 }
 

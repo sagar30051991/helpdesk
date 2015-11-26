@@ -13,4 +13,10 @@ frappe.ui.form.on("Ticket Escalation Settings", "is_default", function(frm){
 			}
 		)
 	}
-})
+});
+
+frappe.ui.form.on("Ticket Escalation Settings", "refresh", function(frm){
+	if(cur_frm.docname === "Default"){
+		cur_frm.toggle_enable("escalation_hierarchy", false);
+	}
+});

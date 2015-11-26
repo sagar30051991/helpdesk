@@ -25,6 +25,10 @@ def is_valid_datetime(val, date_format):
 	except Exception, e:
 		raise Exception("Invalid date value format")
 
+def autoname_todo(doc, method):
+    from frappe.naming import make_autoname
+    doc.name = make_autoname('ToDo.#######')
+
 def send_mail(args, subject):
     """send mail to user"""
     from frappe.utils.user import get_user_fullname
