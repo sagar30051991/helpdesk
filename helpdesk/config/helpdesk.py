@@ -35,6 +35,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Role Priority Settings",
+					"description": _("Setup Role Priority.")
+				},
+				{
+					"type": "doctype",
 					"name": "Ticket Escalation Settings",
 					"description": _("Support Ticket Escalation Settings.")
 				},

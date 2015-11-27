@@ -49,16 +49,21 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 def todo_on_update(doc, method):
 	if not doc.reference_type and doc.reference_name:
 		return
-	elif doc.reference_type == "Issue" and not doc.reference_name:
-		frappe.throw("Please select the reference name first")
 	elif doc.reference_type == "Issue":
+		# condition = not doc.reference_name and not doc.assigned_by and not doc.role
+		# if not doc.reference_name:
+		# 	frappe.throw("Please select the reference name field first")
+		# if not doc.assigned_by:
+		# 	frappe.throw("Please select the assigned by field first")
+		# if not doc.role:
+		# 	frappe.throw("Please select the assigned by field first")
+	
 		esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.reference_name}, "name")
 		create_update_escalation_record(todo=doc, esc_name=esc_name)
 
 def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	if not todo:
 		todo = frappe.get_doc("ToDo", todo_name)
-
 	esc = frappe.get_doc("Ticket Escalation History", esc_name)
 	rec_id = frappe.db.get_value("Escalation Record",{"parent":esc_name, "todo":todo.name},"name")
 
@@ -79,7 +84,7 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	esc.is_assigned = 1
 	esc.assigned_on = get_datetime()
 	esc.current_owner = todo.owner
-	esc.current_role = get_user_role(todo.owner)
+	esc.current_role = todo.role
 	esc.save(ignore_permissions=True)
 
 def get_user_role(user):
