@@ -23,8 +23,6 @@ helpdesk.DashboardGridView = Class.extend({
 		$.extend(this, opts);
 		this.make_filters(wrapper)
 		
-		// this.filter_inputs = {};
-		// this.preset_checks = [];
 		var me = this;
 
 		this.wrapper = $('<div class="grid-report"></div>').appendTo(this.page.main);
@@ -37,6 +35,7 @@ helpdesk.DashboardGridView = Class.extend({
 		this.refresh();
 	},
 	refresh: function(){
+		this.check_mandatory_fields()
 		var me = this;
 		this.waiting.toggle(true);
 		return frappe.call({
@@ -60,29 +59,25 @@ helpdesk.DashboardGridView = Class.extend({
 	},
 	make_filters: function(wrapper){
 		var me = this;
+		from_date = dateutil.get_today()
 
 		this.page = wrapper.page;
 
 		this.page.set_primary_action(__("Refresh"),
 			function() { me.refresh(); }, "icon-refresh")
 
+		this.start = this.page.add_field({fieldtype:"Date", label:"From Date", fieldname:"start", reqd:1,
+			default:dateutil.add_days(dateutil.get_today(), -30)});
+		this.end = this.page.add_field({fieldtype:"Date", label:"To Date", fieldname:"end", reqd:1,
+			default:dateutil.get_today()});
 		this.status = this.page.add_field({fieldtype:"Select", fieldname: "status", 
 			label: __("Ticket Status"), options:["All", "Open", "Pending", "Close"], default:"All"});
-		this.range = this.page.add_field({fieldtype:"Select", label: __("Range"), fieldname: "range",
-			options:[{label: __("Daily"), value: "Daily"}, {label: __("Weekly"), value: "Weekly"},
-				{label: __("Monthly"), value: "Monthly"}, {label: __("Quarterly"), value: "Quarterly"},
-				{label: __("Yearly"), value: "Yearly"}], default: "Weekly"});
-		this.start = this.page.add_field({fieldtype:"Date", label:"Start Date", fieldname:"start"});
-		this.end = this.page.add_field({fieldtype:"Date", label:"End Date", fieldname:"end"});
 		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
 			fieldname:"department", options:"Department"});
 	},
 	make_waiting: function() {
 		this.waiting = frappe.messages.waiting(this.wrapper, __("Loading Report")+"...");
 	},
-	// get_data_and_refresh: function(){
-
-	// },
 	render_plot: function() {
 		// var plot_data = this.get_support_ticket_data ? this.get_support_ticket_data() : null;
 		// var plot_data = this.get_plot_data ? this.get_plot_data() : null;
@@ -91,13 +86,11 @@ helpdesk.DashboardGridView = Class.extend({
 			this.plot_area.toggle(false);
 			return;
 		}
-		console.log(this.data)
 		frappe.require('assets/frappe/js/lib/flot/jquery.flot.js');
 		frappe.require('assets/frappe/js/lib/flot/jquery.flot.downsample.js');
-
-		// this.plot = $.plot(this.plot_area.toggle(true), plot_data,
-		// 	this.get_plot_options());
-		this.plot = $.plot(this.plot_area.toggle(true), plot_data)
+		console.log(plot_data)
+		this.plot = $.plot(this.plot_area.toggle(true), plot_data, this.get_plot_options());
+		// this.plot = $.plot(this.plot_area.toggle(true), plot_data)
 
 		// this.setup_plot_hover();
 	},
@@ -187,10 +180,26 @@ helpdesk.DashboardGridView = Class.extend({
 		return {
 			grid: { hoverable: true, clickable: true },
 			xaxis: { mode: "time",
-				min: dateutil.str_to_obj(this.from_date).getTime(),
-				max: dateutil.str_to_obj(this.to_date).getTime() 
+				// min: dateutil.str_to_obj(this.start).getTime(),
+				// max: dateutil.str_to_obj(this.end).getTime() 
+				min: dateutil.str_to_obj(this.page.fields_dict.start.get_parsed_value()).getTime(),
+				max: dateutil.str_to_obj(this.page.fields_dict.end.get_parsed_value()).getTime() 
 			},
 			series: { downsample: { threshold: 1000 } }
+		}
+	},
+	check_mandatory_fields: function(){
+		start = this.page.fields_dict.start.get_parsed_value()
+		end = this.page.fields_dict.end.get_parsed_value()
+
+		if(!(start && end)){
+			frappe.throw("From Date and To Date are mandatory");
+		}
+		else if(!start){
+			frappe.throw("From Date is mandatory");
+		}
+		else if(!end){
+			frappe.throw("To Date is mandatory");
 		}
 	}
 });
