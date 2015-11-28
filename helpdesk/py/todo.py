@@ -42,3 +42,30 @@ def validate_due_date(doc):
 
 def validate_assigned_by(doc):
 	"""Do not allow low authority user to assign ticket to higher authority"""
+	from frappe.utils.user import get_roles
+	query = """	SELECT
+				    MAX(rp.priority)
+				FROM
+				    `tabRole Priority` rp
+				WHERE
+				    rp.role IN (%s)"""%(["'%s'"%(role) for role in get_roles(doc.assigned_by)]])
+	
+	assigned_by_priority = frappe.db.sql(query, as_list=True)[0][0]
+	owner_priority = get_role_priority(doc.role)
+	if owner_priority > assigned_by_priority:
+		frappe.throw("Can not assign the ToDo to higher authority")
+
+def get_role_priority(role=None):
+	filters = {
+		"parent": "Role Priority Settings"
+	}
+	if role:
+		filters.update({"role": role})
+
+	priority = frappe.db.get_values("Role Priority", filters, ["role", "priority"], as_dict=True)
+	if not priority:
+		frappe.throw("Can Not find the priority for the selected role")
+	elif not role:
+		return priority
+	else:
+		return priority

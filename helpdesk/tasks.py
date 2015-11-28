@@ -301,5 +301,5 @@ def get_user_from_role(role, department=None, is_department=False):
     elif len(users) == 1:
         return users[0].get("name")
     else:
-        # multiple user how to select ?
+        #TODO multiple user how to select ?
         pass
