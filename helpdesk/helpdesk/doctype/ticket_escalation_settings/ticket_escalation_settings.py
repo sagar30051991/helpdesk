@@ -35,12 +35,12 @@ class TicketEscalationSettings(Document):
 		elif len(set([ch.role for ch in self.escalation_hierarchy])) != len(self.escalation_hierarchy):
 			frappe.throw("Escalation hierarchy contains duplicate records")
 		else:
-			# TODO check if escalation hierarchy record is correct or not
+			# check if escalation hierarchy record is correct or not
 			entries = self.escalation_hierarchy
 			self.validate_hierarchy_entries(entries)
 
 	def validate_hierarchy_entries(self, entries):
-		"""TODO check order of users roles according the their authority"""
+		"""check order of users roles according the their authority"""
 		doc = frappe.get_doc("Role Priority Settings", "Role Priority Settings")
 		priority_dict = {ch.role:ch.priority for ch in doc.roles_priority}
 

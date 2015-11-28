@@ -154,7 +154,6 @@ def get_time_difference(esc_setting, role="Administrator"):
 def escalate_ticket_to_higher_authority(esc_setting, record):
     """
         TODO Escalate ticket to higher authority
-        Check the 
     """
     current_role = record.get("current_role")
 

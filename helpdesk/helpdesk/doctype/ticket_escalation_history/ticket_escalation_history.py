@@ -87,6 +87,6 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	esc.current_role = todo.role
 	esc.save(ignore_permissions=True)
 
-def get_user_role(user):
-	return "Support Team"
-	# TODO get role high priority role
+# def get_user_role(user):
+# 	return "Support Team"
+# 	# TODO get role high priority role
