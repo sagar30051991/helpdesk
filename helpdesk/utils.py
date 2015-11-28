@@ -25,6 +25,10 @@ def is_valid_datetime(val, date_format):
 	except Exception, e:
 		raise Exception("Invalid date value format")
 
+def autoname_todo(doc, method):
+    from frappe.naming import make_autoname
+    doc.name = make_autoname('ToDo.#######')
+
 def send_mail(args, subject):
     """send mail to user"""
     from frappe.utils.user import get_user_fullname
@@ -80,7 +84,13 @@ def build_table(data, has_header=True, is_horizontal=False):
     table = """<table border="1px" style="border-collapse: collapse;">{thead}{tbody}</table>""".format(thead=thead or "", tbody=tbody)
     
     return table
- 
+
+def create_scheduler_log(err_msg, err_traceback, method):
+    se = frappe.new_doc('Scheduler Log')
+    se.method = method
+    se.error = "%s\n%s"%(err_msg, err_traceback)
+    se.save(ignore_permissions=True)
+
 email_templates = {
 	"open_tickets": "templates/email/open_ticket_template.html",
 	"new_ticket": "templates/email/new_ticket_template.html"

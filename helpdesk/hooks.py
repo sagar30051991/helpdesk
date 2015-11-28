@@ -72,8 +72,13 @@ doc_events = {
 		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.issue_on_trash"
 	},
 	"ToDo": {
+		"validate": "helpdesk.py.todo.validate_todo",
 		"on_update": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_update",
-		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_trash"
+		"on_trash": "helpdesk.helpdesk.doctype.ticket_escalation_history.ticket_escalation_history.todo_on_trash",
+		"autoname": "helpdesk.utils.autoname_todo"
+	},
+	"User": {
+		"validate": "helpdesk.py.user.validate_user"
 	}
 }
 
@@ -83,13 +88,13 @@ doc_events = {
 scheduler_events = {
 	"all": [
 		"helpdesk.tasks.sync_db"
-	]
+	],
 	# "daily": [
 	# 	"helpdesk.tasks.daily"
 	# ],
-	# "hourly": [
-	# 	"helpdesk.tasks.hourly"
-	# ],
+	"hourly": [
+		"helpdesk.tasks.ticket_escallation"
+	],
 	# "weekly": [
 	# 	"helpdesk.tasks.weekly"
 	# ]
