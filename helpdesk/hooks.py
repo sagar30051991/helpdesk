@@ -103,6 +103,8 @@ scheduler_events = {
 	# ]
 }
 
+fixtures = ["Property Setter", "Custom Field"]
+
 # Testing
 # -------
 
