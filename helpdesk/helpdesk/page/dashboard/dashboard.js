@@ -31,7 +31,6 @@ helpdesk.DashboardGridView = Class.extend({
 		this.plot_area = $('<div class="plot"></div>').appendTo(this.wrapper);
 
 		this.make_waiting();
-		// this.refresh();
 		this.refresh();
 	},
 	refresh: function(){
@@ -50,7 +49,7 @@ helpdesk.DashboardGridView = Class.extend({
 			},
 			callback: function(r){
 				if(r.message){
-					me.data = r.message
+					me.data = this.get_plot_data ? this.get_plot_data(r.message) : null;
 					me.waiting.toggle(false);
 					me.render_plot();
 				}
@@ -59,8 +58,6 @@ helpdesk.DashboardGridView = Class.extend({
 	},
 	make_filters: function(wrapper){
 		var me = this;
-		from_date = dateutil.get_today()
-
 		this.page = wrapper.page;
 
 		this.page.set_primary_action(__("Refresh"),
@@ -78,9 +75,17 @@ helpdesk.DashboardGridView = Class.extend({
 	make_waiting: function() {
 		this.waiting = frappe.messages.waiting(this.wrapper, __("Loading Report")+"...");
 	},
+	get_plot_data: function(plot_data){
+		// parse data in flot data format
+		var data = []
+		// $.each(plot_data, function(i, d) {
+		// 	records = d.get("data")
+		// 	$.map(records, function(idx, val){
+				
+		// 	})
+		// });
+	},
 	render_plot: function() {
-		// var plot_data = this.get_support_ticket_data ? this.get_support_ticket_data() : null;
-		// var plot_data = this.get_plot_data ? this.get_plot_data() : null;
 		var plot_data = this.data
 		if(!plot_data) {
 			this.plot_area.toggle(false);
@@ -88,9 +93,8 @@ helpdesk.DashboardGridView = Class.extend({
 		}
 		frappe.require('assets/frappe/js/lib/flot/jquery.flot.js');
 		frappe.require('assets/frappe/js/lib/flot/jquery.flot.downsample.js');
-		console.log(plot_data)
+
 		this.plot = $.plot(this.plot_area.toggle(true), plot_data, this.get_plot_options());
-		// this.plot = $.plot(this.plot_area.toggle(true), plot_data)
 
 		// this.setup_plot_hover();
 	},
@@ -152,36 +156,10 @@ helpdesk.DashboardGridView = Class.extend({
 	 	var value = format_number(y);
 		return value + " on " + date;
 	},
-	get_plot_data: function() {
-		// var data = [];
-		// var me = this;
-		// $.each(this.data, function(i, item) {
-		// 	if (item.checked) {
-		// 		data.push({
-		// 			label: item.name,
-		// 			data: $.map(me.columns, function(col, idx) {
-		// 				if(col.formatter==me.currency_formatter && !col.hidden && col.plot!==false) {
-		// 					return me.get_plot_points(item, col, idx)
-		// 				}
-		// 			}),
-		// 			points: {show: true},
-		// 			lines: {show: true, fill: true},
-		// 		});
-
-		// 		// prepend opening
-		// 		data[data.length-1].data = [[dateutil.str_to_obj(me.from_date).getTime(),
-		// 			item.opening]].concat(data[data.length-1].data);
-		// 	}
-		// });
-
-		// return data.length ? data : false;
-	},
 	get_plot_options: function() {
 		return {
 			grid: { hoverable: true, clickable: true },
 			xaxis: { mode: "time",
-				// min: dateutil.str_to_obj(this.start).getTime(),
-				// max: dateutil.str_to_obj(this.end).getTime() 
 				min: dateutil.str_to_obj(this.page.fields_dict.start.get_parsed_value()).getTime(),
 				max: dateutil.str_to_obj(this.page.fields_dict.end.get_parsed_value()).getTime() 
 			},
