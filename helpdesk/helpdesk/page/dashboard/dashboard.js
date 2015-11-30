@@ -44,14 +44,21 @@ helpdesk.DashboardGridView = Class.extend({
 				args:{
 						start: this.page.fields_dict.start.get_parsed_value(),
 						end: this.page.fields_dict.end.get_parsed_value(),
-						status: this.page.fields_dict.status.get_parsed_value()
+						status: this.page.fields_dict.status.get_parsed_value(),
+						user: frappe.user.name
 				}
 			},
 			callback: function(r){
 				if(r.message){
-					me.data = this.get_plot_data ? this.get_plot_data(r.message) : null;
+					// me.data = me.get_plot_data ? me.get_plot_data(r.message) : null;
+					me.data = r.message;
 					me.waiting.toggle(false);
 					me.render_plot();
+				}
+				else{
+					me.plot_area.toggle(false);
+					me.waiting.html("Support Ticket Records Not found");
+					me.waiting.toggle(true);
 				}
 			}
 		});
@@ -68,7 +75,7 @@ helpdesk.DashboardGridView = Class.extend({
 		this.end = this.page.add_field({fieldtype:"Date", label:"To Date", fieldname:"end", reqd:1,
 			default:dateutil.get_today()});
 		this.status = this.page.add_field({fieldtype:"Select", fieldname: "status", 
-			label: __("Ticket Status"), options:["All", "Open", "Pending", "Close"], default:"All"});
+			label: __("Ticket Status"), options:["All", "Open", "Pending", "Closed"], default:"All"});
 		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
 			fieldname:"department", options:"Department"});
 	},
@@ -78,12 +85,13 @@ helpdesk.DashboardGridView = Class.extend({
 	get_plot_data: function(plot_data){
 		// parse data in flot data format
 		var data = []
-		// $.each(plot_data, function(i, d) {
-		// 	records = d.get("data")
-		// 	$.map(records, function(idx, val){
-				
-		// 	})
-		// });
+		$.each(plot_data, function(i, d) {
+			records = d["data"]
+			new_records = []
+			$.map(records, function(val, idx){
+
+			});
+		});
 	},
 	render_plot: function() {
 		var plot_data = this.data
