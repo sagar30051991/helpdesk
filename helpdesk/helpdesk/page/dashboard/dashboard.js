@@ -136,7 +136,7 @@ helpdesk.DashboardGridView = Class.extend({
 		<span class="open-notification">'+ info.pending_tickets +'</span></div></div><div class="row">\
 		<div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5"><span class="open-notification">'+ 
 		info.closed_tickets +'</span></div></div></div><div class="col-md-6"><div class="row"><div class="col-md-12" \
-		align="center"><h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div>'
+		align="center"><h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div><br>'
 
 
 		links_info = [
@@ -165,11 +165,11 @@ helpdesk.DashboardGridView = Class.extend({
 	},
 	render_links_icon:function(links_info){
 		$.each(links_info, function(i, m) {
-			html = '<div class="case-wrapper" data-name="%(title)s" \
-			data-link="Module/%(title)s" title="%(title)s"><a href="%(link)s"><div class="app-icon" style="background-color: \
-			%(bgcolor)s" title="%(title)s" align="center"><i class="%(icon)s" title="%(title)s"></i>\
-			</div></a><div class="case-label text-ellipsis"> <div><span class="case-label-text" \
-			style="color: black;text-shadow: none;">%(title)s</span></div></div></div>'
+			html = '<div style="display:inline-block;margin-left: 10px;margin-right: 10px;">\
+			<a href="%(link)s"><div class="app-icon" style="background-color: %(bgcolor)s" \
+			title="%(title)s" align="center"><i class="%(icon)s" title="%(title)s"></i></div>\
+			</a><div class="case-label text-ellipsis"><span class="case-label-text" style="color:\
+			 black;text-shadow: none;">%(title)s</span></div></div>'
 
 			$(repl(html, m)).appendTo($("#links"));
 		});
