@@ -30,7 +30,18 @@ helpdesk.DashboardGridView = Class.extend({
 		this.page.main.find(".page").css({"padding-top": "0px"});
 		this.plot_area = $('<div class="plot"></div>').appendTo(this.wrapper);
 		
-		$('<div id="summary"></div>').appendTo(this.page.main);
+		this.summary = $('<div id="summary"></div>').appendTo(this.page.main);
+		
+		this.wrapper.css({
+			"border-style":"solid",
+			"border-width": "2px",
+			"border-radius": "10px"
+		})
+		this.summary.css({
+			"border-style":"none solid solid",
+			"border-width": "2px",
+			"border-radius": "10px"
+		})
 
 		this.make_waiting();
 		this.refresh();
@@ -52,20 +63,19 @@ helpdesk.DashboardGridView = Class.extend({
 				}
 			},
 			callback: function(r){
-				if(r.message){
+				if(r.message.plot_data){
 					me.data = r.message.plot_data;
 					me.waiting.toggle(false);
 					me.render_plot();
-
-					delete r.message["plot_data"]
-
-					me.render_summery_info(r.message);
 				}
 				else{
 					me.plot_area.toggle(false);
 					me.waiting.html("Support Ticket Records Not found");
 					me.waiting.toggle(true);
 				}
+
+				delete r.message["plot_data"]
+				me.render_summery_info(r.message);
 			}
 		});
 	},
@@ -118,32 +128,34 @@ helpdesk.DashboardGridView = Class.extend({
 	},
 	render_summery_info: function(info){
 		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>\
-		Helpdesk Support Ticket Summary</h3></div></div><div class="row"><div class="col-md-7" align="right">\
-		<b>Total Number Of Tickets</b></div><div class="col-md-5">'+ info.total_tickets +'</div></div>\
-		<div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b></div><div class="col-md-5">'+
-		info.open_tickets +'</div></div><div class="row"><div class="col-md-7" align="right"><b>Pending Tickets\
-		</b></div><div class="col-md-5">'+ info.pending_tickets +'</div></div><div class="row">\
-		<div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5">'+
-		info.closed_tickets +'</div></div></div><div class="col-md-6"><div class="row"><div class="col-md-12" align="center">\
-		<h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div>'
+		Helpdesk Support Ticket Summary</h3></div></div><br><div class="row"><div class="col-md-7" align="right">\
+		<b>Total Number Of Tickets</b></div><div class="col-md-5"><span class="open-notification">'+
+		info.total_tickets +'</span></div></div><div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b>\
+		</div><div class="col-md-5"><span class="open-notification">'+info.open_tickets +'</span></div></div>\
+		<div class="row"><div class="col-md-7" align="right"><b>Pending Tickets</b></div><div class="col-md-5">\
+		<span class="open-notification">'+ info.pending_tickets +'</span></div></div><div class="row">\
+		<div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5"><span class="open-notification">'+ 
+		info.closed_tickets +'</span></div></div></div><div class="col-md-6"><div class="row"><div class="col-md-12" \
+		align="center"><h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div>'
+
 
 		links_info = [
 			{
 				"title": "ToDo",
 				"icon": "octicon octicon-list-unordered",
-				"bgcolor": "grey",
+				"bgcolor": "#4aa3df",
 				"link":"#List/ToDo"
 			},
 			{
 				"title": "Support Ticket",
 				"icon": "octicon octicon-issue-opened",
-				"bgcolor": "grey",
+				"bgcolor": "#4aa3df",
 				"link": "#List/Issue"
 			},
 			{
 				"title": "Desk",
 				"icon": "octicon octicon-briefcase",
-				"bgcolor": "grey",
+				"bgcolor": "#4aa3df",
 				"link": "#Module/HelpDesk"
 			}
 		]
