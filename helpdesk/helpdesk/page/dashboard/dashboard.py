@@ -31,9 +31,9 @@ def get_support_ticket_data(args):
 				}]
 
 	"""
+	# TODO check permissions
 	args = json.loads(args)
 	query = build_query(args)
-	frappe.errprint(query)
 	
 	resultSet = frappe.db.sql(query, as_dict=True)
 	if not resultSet:
@@ -45,6 +45,7 @@ def build_query(filters):
 	def build_conditions(filters):
 		condition = ""
 		status = ""
+		department = ""
 		date_type = "opening_date"
 
 		# status
@@ -56,19 +57,28 @@ def build_query(filters):
 			date_type = "resolution_date" if filters.get("status") == "Closed" else "opening_date"
 		# order by
 		order_by = "ORDER BY {field} ASC".format(field=date_type)
+		# department
+		if filters.get("dept"):
+			department = "AND department='%s'"%(filters.get("dept"))
 		# date conditions
-		condition = "WHERE {field} BETWEEN '{start}' AND '{end}' {status} {order_by}".format(
+		condition = "WHERE {field} BETWEEN '{start}' AND '{end}' {dept} {status} {order_by}".format(
 				field=date_type,
 				start=filters.get("start"),
 				end=filters.get("end"),
+				dept=department,
 				status=status,
 				order_by=order_by
 			)
 
 		return condition
 
-	return """SELECT name, opening_date, opening_time, resolution_date, status FROM `tabIssue` {conditions}""".format(conditions=build_conditions(filters))
-	
+	return """	SELECT
+					name, status,
+					opening_time, resolution_date,
+					opening_date
+				FROM
+					`tabIssue` {conditions}""".format(conditions=build_conditions(filters))
+
 def datetime_to_time(dt):
 	import datetime, time
 	return time.mktime(dt.timetuple()) * 1000
@@ -78,17 +88,23 @@ def get_flot_formatted_data(opened, closed, pending):
 	if opened:
 		data.append({
 			"label":"Open",
-			"data": opened
+			"data": opened,
+			"points": {"show": True},
+			"lines": {"show": True, "fill": True},
 		})
 	if closed:
 		data.append({
 			"label":"Closed",
-			"data": closed
+			"data": closed,
+			"points": {"show": True},
+			"lines": {"show": True, "fill": True},
 		})
 	if pending:
 		data.append({
 			"label":"Pending",
-			"data": pending
+			"data": pending,
+			"points": {"show": True},
+			"lines": {"show": True, "fill": True},
 		})
 
 	return data
@@ -128,6 +144,10 @@ def get_data_in_flot_format(start, end, status, records):
 	closed = []
 	pending = []
 
+	c_open = 0
+	c_closed = 0
+	c_pending = 0
+
 	for i in xrange(0, days):
 		date = str(add_days(start, i))
 		record = records.get(date)
@@ -135,39 +155,60 @@ def get_data_in_flot_format(start, end, status, records):
 		datetime_str = datetime_to_time(get_datetime("{0} 00:00:00".format(date)))
 
 		if not record:
-			opened.append([datetime_str, 0])
-			closed.append([datetime_str, 0])
-			pending.append([datetime_str, 0])
+			opened.append([datetime_str, 0, "NA"])
+			closed.append([datetime_str, 0, "NA"])
+			pending.append([datetime_str, 0, "NA"])
 		else:
 			open_tickets = record.get("Open")
 			if not open_tickets:
-				opened.append([datetime_str, 0])
+				opened.append([datetime_str, 0, "NA"])
 			else:
 				count = len(open_tickets)
-				# names = ",".join([r.get("name") for r in open_tickets])
-				opened.append([datetime_str, count])
+				c_open += count
+				names = get_names_as_html_string([r.get("name") for r in open_tickets])
+				opened.append([datetime_str, count, names])
 
 			closed_tickets = record.get("Closed")
 			if not closed_tickets:
-				closed.append([[datetime_str, 0]])
+				closed.append([[datetime_str, 0, "NA"]])
 			else:
 				count = len(closed_tickets)
-				# names = ",".join([r.get("name") for r in closed_tickets])
-				closed.append([datetime_str, count])
+				c_closed += count
+				names = get_names_as_html_string([r.get("name") for r in closed_tickets])
+				closed.append([datetime_str, count, names])
 
 			pending_ticket = record.get("Pending")
 			if not pending_ticket:
-				pending.append([datetime_str, 0])
+				pending.append([datetime_str, 0, "NA"])
 			else:
 				count = len(pending_ticket)
-				# names = ",".join([r.get("name") for r in pending_ticket])
-				pending.append([datetime_str, count])
+				c_pending += count
+				names = get_names_as_html_string([r.get("name") for r in pending_ticket])
+				pending.append([datetime_str, count, names])
 
+	plot_data = None
 	if status == "All":
-		return get_flot_formatted_data(opened, closed, pending)
+		plot_data = get_flot_formatted_data(opened, closed, pending)
 	elif status == "Open":
-		return get_flot_formatted_data(opened, None, None)
+		plot_data = get_flot_formatted_data(opened, None, None)
 	elif status == "Closed":
-		return get_flot_formatted_data(None, closed, None)
+		plot_data = get_flot_formatted_data(None, closed, None)
 	else:
-		return get_flot_formatted_data(None, None, pending)
+		plot_data = get_flot_formatted_data(None, None, pending)
+
+	data = {
+		"total_tickets": c_open + c_closed + c_pending,
+		"open_tickets": c_open,
+		"closed_tickets": c_closed,
+		"pending_tickets": c_pending,
+		"plot_data": plot_data
+	}
+
+	return data
+
+def get_names_as_html_string(names):
+	if len(names) > 2:
+		names = names[:2]
+		total = len(names) - 2
+		names.append("and 2 more")
+	return "<br>".join([r for r in names])

@@ -27,8 +27,9 @@ helpdesk.DashboardGridView = Class.extend({
 
 		this.wrapper = $('<div class="grid-report"></div>').appendTo(this.page.main);
 		this.page.main.find(".page").css({"padding-top": "0px"});
-		
 		this.plot_area = $('<div class="plot"></div>').appendTo(this.wrapper);
+		
+		$('<div id="summary" style="padding:15px"></div>').appendTo(this.page.main);
 
 		this.make_waiting();
 		this.refresh();
@@ -45,15 +46,20 @@ helpdesk.DashboardGridView = Class.extend({
 						start: this.page.fields_dict.start.get_parsed_value(),
 						end: this.page.fields_dict.end.get_parsed_value(),
 						status: this.page.fields_dict.status.get_parsed_value(),
+						dept: this.page.fields_dict.department.get_parsed_value(),
 						user: frappe.user.name
 				}
 			},
 			callback: function(r){
 				if(r.message){
 					// me.data = me.get_plot_data ? me.get_plot_data(r.message) : null;
-					me.data = r.message;
+					me.data = r.message.plot_data;
 					me.waiting.toggle(false);
 					me.render_plot();
+
+					delete r.message["plot_data"]
+
+					me.render_summery_info(r.message);
 				}
 				else{
 					me.plot_area.toggle(false);
@@ -82,17 +88,6 @@ helpdesk.DashboardGridView = Class.extend({
 	make_waiting: function() {
 		this.waiting = frappe.messages.waiting(this.wrapper, __("Loading Report")+"...");
 	},
-	get_plot_data: function(plot_data){
-		// parse data in flot data format
-		var data = []
-		$.each(plot_data, function(i, d) {
-			records = d["data"]
-			new_records = []
-			$.map(records, function(val, idx){
-
-			});
-		});
-	},
 	render_plot: function() {
 		var plot_data = this.data
 		if(!plot_data) {
@@ -104,7 +99,18 @@ helpdesk.DashboardGridView = Class.extend({
 
 		this.plot = $.plot(this.plot_area.toggle(true), plot_data, this.get_plot_options());
 
-		// this.setup_plot_hover();
+		this.setup_plot_hover();
+	},
+	render_summery_info: function(info){
+		console.log(info)
+		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>Helpdesk Support Ticket Summary</h3></div></div><div class="row"><div class="col-md-7" align="right">\
+		<b>Total Number Of Tickets</b></div><div class="col-md-5">'+ info.total_tickets +'</div></div>\
+		<div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b></div><div class="col-md-5">'+ info.open_tickets +'</div>\
+		</div><div class="row"><div class="col-md-7" align="right"><b>Pending Tickets</b></div><div class="col-md-5">'+ info.pending_tickets +'</div>\
+		</div><div class="row"><div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5">'+ info.closed_tickets +'</div>\
+		</div></div><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>Links</h3></div></div><div class="row"><div class="col-md-12">ToDo</div></div><div class="row"><div class="col-md-12">Support Ticket</div></div></div></div>'
+
+		$("#summary").html(html)
 	},
 	setup_plot_check: function() {
 		var me = this;
@@ -136,7 +142,8 @@ helpdesk.DashboardGridView = Class.extend({
 				left: x + 5,
 				border: '1px solid #fdd',
 				padding: '2px',
-				'background-color': '#fee',
+				// 'background-color': '#fee',
+				'background-color': '#ffffd2',
 				opacity: 0.80
 			}).appendTo("body").fadeIn(200);
 		}
@@ -148,8 +155,10 @@ helpdesk.DashboardGridView = Class.extend({
 					me.previousPoint = item.dataIndex;
 
 					$("#" + me.tooltip_id).remove();
+					idx = item.dataIndex
+					names = item.series.data[idx][2]
 					showTooltip(item.pageX, item.pageY,
-						me.get_tooltip_text(item.series.label, item.datapoint[0], item.datapoint[1]));
+						me.get_tooltip_text(item.series.label, item.datapoint[0], item.datapoint[1], names));
 				}
 			}
 			else {
@@ -159,10 +168,17 @@ helpdesk.DashboardGridView = Class.extend({
 	    });
 
 	},
-	get_tooltip_text: function(label, x, y) {
+	get_tooltip_text: function(label, x, y, names) {
 		var date = dateutil.obj_to_user(new Date(x));
-	 	var value = format_number(y);
-		return value + " on " + date;
+	 	var value = format_number(y, null, 0);
+	 	html =  "<table border=1 style='border-collapse: collapse;'><tr>"
+	 	html += "<td colspan='2' align='center'><b>"+ label +" Tickets</b></td></tr>"
+	 	html += "<tr><td><b>Date</b></td><td style='padding: 5px;'>"+ date 
+	 	html += "</td></tr><tr><td><b>No. Of Tickets</b></td>"
+	 	html += "<td style='padding: 5px;' align='right'>"+ value 
+	 	html += "</td></tr><tr><td><b>Ticket ID's</b></td>"
+	 	html += "<td style='padding: 5px;'>" + names + "</td></tr></table>"
+		return html
 	},
 	get_plot_options: function() {
 		return {
@@ -171,6 +187,7 @@ helpdesk.DashboardGridView = Class.extend({
 				min: dateutil.str_to_obj(this.page.fields_dict.start.get_parsed_value()).getTime(),
 				max: dateutil.str_to_obj(this.page.fields_dict.end.get_parsed_value()).getTime() 
 			},
+			yaxis: { autoscaleMargin: 1 },
 			series: { downsample: { threshold: 1000 } }
 		}
 	},
