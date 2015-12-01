@@ -37,7 +37,13 @@ def get_support_ticket_data(args):
 	
 	resultSet = frappe.db.sql(query, as_dict=True)
 	if not resultSet:
-		return None
+		return {
+			"total_tickets": 0,
+			"open_tickets": 0,
+			"closed_tickets": 0,
+			"pending_tickets": 0,
+			"plot_data": None
+		}
 	day_wise_record = get_day_wise_records(resultSet)
 	return get_data_in_flot_format(args.get("start"), args.get("end"), args.get("status"), day_wise_record)
 	

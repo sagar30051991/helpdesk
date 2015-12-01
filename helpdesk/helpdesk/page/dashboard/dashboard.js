@@ -22,6 +22,7 @@ helpdesk.DashboardGridView = Class.extend({
 	init: function(opts, wrapper, page) {
 		$.extend(this, opts);
 		this.make_filters(wrapper)
+		this.bind_filters()
 		
 		var me = this;
 
@@ -29,7 +30,7 @@ helpdesk.DashboardGridView = Class.extend({
 		this.page.main.find(".page").css({"padding-top": "0px"});
 		this.plot_area = $('<div class="plot"></div>').appendTo(this.wrapper);
 		
-		$('<div id="summary" style="padding:15px"></div>').appendTo(this.page.main);
+		$('<div id="summary"></div>').appendTo(this.page.main);
 
 		this.make_waiting();
 		this.refresh();
@@ -52,7 +53,6 @@ helpdesk.DashboardGridView = Class.extend({
 			},
 			callback: function(r){
 				if(r.message){
-					// me.data = me.get_plot_data ? me.get_plot_data(r.message) : null;
 					me.data = r.message.plot_data;
 					me.waiting.toggle(false);
 					me.render_plot();
@@ -85,6 +85,21 @@ helpdesk.DashboardGridView = Class.extend({
 		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
 			fieldname:"department", options:"Department"});
 	},
+	bind_filters:function(){
+		var me = this
+		this.start.$input.change(function(){
+			me.validate_fields_and_refresh();
+		});
+		this.end.$input.change(function(){
+			me.validate_fields_and_refresh();
+		});
+		this.status.$input.change(function(){
+			me.validate_fields_and_refresh();
+		});
+		this.department.$input.change(function(){
+			me.validate_fields_and_refresh();
+		});
+	},
 	make_waiting: function() {
 		this.waiting = frappe.messages.waiting(this.wrapper, __("Loading Report")+"...");
 	},
@@ -102,15 +117,50 @@ helpdesk.DashboardGridView = Class.extend({
 		this.setup_plot_hover();
 	},
 	render_summery_info: function(info){
-		console.log(info)
-		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>Helpdesk Support Ticket Summary</h3></div></div><div class="row"><div class="col-md-7" align="right">\
+		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>\
+		Helpdesk Support Ticket Summary</h3></div></div><div class="row"><div class="col-md-7" align="right">\
 		<b>Total Number Of Tickets</b></div><div class="col-md-5">'+ info.total_tickets +'</div></div>\
-		<div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b></div><div class="col-md-5">'+ info.open_tickets +'</div>\
-		</div><div class="row"><div class="col-md-7" align="right"><b>Pending Tickets</b></div><div class="col-md-5">'+ info.pending_tickets +'</div>\
-		</div><div class="row"><div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5">'+ info.closed_tickets +'</div>\
-		</div></div><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>Links</h3></div></div><div class="row"><div class="col-md-12">ToDo</div></div><div class="row"><div class="col-md-12">Support Ticket</div></div></div></div>'
+		<div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b></div><div class="col-md-5">'+
+		info.open_tickets +'</div></div><div class="row"><div class="col-md-7" align="right"><b>Pending Tickets\
+		</b></div><div class="col-md-5">'+ info.pending_tickets +'</div></div><div class="row">\
+		<div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5">'+
+		info.closed_tickets +'</div></div></div><div class="col-md-6"><div class="row"><div class="col-md-12" align="center">\
+		<h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div>'
+
+		links_info = [
+			{
+				"title": "ToDo",
+				"icon": "octicon octicon-list-unordered",
+				"bgcolor": "grey",
+				"link":"#List/ToDo"
+			},
+			{
+				"title": "Support Ticket",
+				"icon": "octicon octicon-issue-opened",
+				"bgcolor": "grey",
+				"link": "#List/Issue"
+			},
+			{
+				"title": "Desk",
+				"icon": "octicon octicon-briefcase",
+				"bgcolor": "grey",
+				"link": "#Module/HelpDesk"
+			}
+		]
 
 		$("#summary").html(html)
+		this.render_links_icon(links_info)
+	},
+	render_links_icon:function(links_info){
+		$.each(links_info, function(i, m) {
+			html = '<div class="case-wrapper" data-name="%(title)s" \
+			data-link="Module/%(title)s" title="%(title)s"><a href="%(link)s"><div class="app-icon" style="background-color: \
+			%(bgcolor)s" title="%(title)s" align="center"><i class="%(icon)s" title="%(title)s"></i>\
+			</div></a><div class="case-label text-ellipsis"> <div><span class="case-label-text" \
+			style="color: black;text-shadow: none;">%(title)s</span></div></div></div>'
+
+			$(repl(html, m)).appendTo($("#links"));
+		});
 	},
 	setup_plot_check: function() {
 		var me = this;
@@ -204,5 +254,18 @@ helpdesk.DashboardGridView = Class.extend({
 		else if(!end){
 			frappe.throw("To Date is mandatory");
 		}
+	},
+	validate_fields_and_refresh: function(me){
+		this.check_mandatory_fields();
+
+		start = new Date(this.page.fields_dict.start.get_parsed_value());
+		end = new Date(this.page.fields_dict.end.get_parsed_value());
+		dept = this.page.fields_dict.department.get_parsed_value();
+		status = this.page.fields_dict.status.get_parsed_value();
+
+		if(end < start){
+			frappe.throw("To Date must be greater than From Date");
+		}
+		this.refresh();
 	}
 });
