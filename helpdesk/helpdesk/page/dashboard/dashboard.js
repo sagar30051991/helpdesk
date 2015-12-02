@@ -7,32 +7,26 @@ frappe.pages['dashboard'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 
-	var options = {
-		doctype: "Issue",
-		parent: page
-	};
-
 	setTimeout(function(){
-		new helpdesk.DashboardGridView(options, wrapper, page);	
+		new helpdesk.DashboardGridView(wrapper, page);	
 	}, 1)
 	frappe.breadcrumbs.add("HelpDesk")
 }
 
 helpdesk.DashboardGridView = Class.extend({
-	init: function(opts, wrapper, page) {
-		$.extend(this, opts);
+	init: function(wrapper, page) {
 		this.make_filters(wrapper)
 		this.bind_filters()
 		
 		var me = this;
 
-		this.wrapper = $('<div class="grid-report"></div>').appendTo(this.page.main);
+		this.report = $('<div class="grid-report"></div>').appendTo(this.page.main);
 		this.page.main.find(".page").css({"padding-top": "0px"});
-		this.plot_area = $('<div class="plot"></div>').appendTo(this.wrapper);
+		this.plot_area = $('<div class="plot"></div>').appendTo(this.report);
 		
 		this.summary = $('<div id="summary"></div>').appendTo(this.page.main);
 		
-		this.wrapper.css({
+		this.report.css({
 			"border-style":"solid",
 			"border-width": "2px",
 			"border-radius": "10px"
@@ -47,7 +41,9 @@ helpdesk.DashboardGridView = Class.extend({
 		this.refresh();
 	},
 	refresh: function(){
-		this.check_mandatory_fields()
+		if(!this.check_mandatory_fields())
+			return
+
 		var me = this;
 		this.waiting.toggle(true);
 		return frappe.call({
@@ -70,7 +66,7 @@ helpdesk.DashboardGridView = Class.extend({
 				}
 				else{
 					me.plot_area.toggle(false);
-					me.waiting.html("Support Ticket Records Not found");
+					me.waiting.html("Support Ticket records not found for selected filters");
 					me.waiting.toggle(true);
 				}
 
@@ -111,7 +107,7 @@ helpdesk.DashboardGridView = Class.extend({
 		});
 	},
 	make_waiting: function() {
-		this.waiting = frappe.messages.waiting(this.wrapper, __("Loading Report")+"...");
+		this.waiting = frappe.messages.waiting(this.report, __("Loading Report")+"...");
 	},
 	render_plot: function() {
 		var plot_data = this.data
@@ -204,14 +200,13 @@ helpdesk.DashboardGridView = Class.extend({
 				left: x + 5,
 				border: '1px solid #fdd',
 				padding: '2px',
-				// 'background-color': '#fee',
 				'background-color': '#ffffd2',
 				opacity: 0.80
 			}).appendTo("body").fadeIn(200);
 		}
 
 		this.previousPoint = null;
-		this.wrapper.find('.plot').bind("plothover", function (event, pos, item) {
+		this.report.find('.plot').bind("plothover", function (event, pos, item) {
 			if (item) {
 				if (me.previousPoint != item.dataIndex) {
 					me.previousPoint = item.dataIndex;
@@ -231,19 +226,23 @@ helpdesk.DashboardGridView = Class.extend({
 
 	},
 	get_tooltip_text: function(label, x, y, names) {
-		var date = dateutil.obj_to_user(new Date(x));
-	 	var value = format_number(y, null, 0);
-	 	html =  "<table border=1 style='border-collapse: collapse;'><tr>"
-	 	html += "<td colspan='2' align='center'><b>"+ label +" Tickets</b></td></tr>"
-	 	html += "<tr><td><b>Date</b></td><td style='padding: 5px;'>"+ date 
-	 	html += "</td></tr><tr><td><b>No. Of Tickets</b></td>"
-	 	html += "<td style='padding: 5px;' align='right'>"+ value 
-	 	html += "</td></tr><tr><td><b>Ticket ID's</b></td>"
-	 	html += "<td style='padding: 5px;'>" + names + "</td></tr></table>"
-		return html
+	 	html =  '<table border=1 style="border-collapse: collapse;"><tr>\
+	 	<td colspan="2" align="center"><b>%(label)s Tickets</b></td></tr>\
+	 	<tr><td><b>Date</b></td><td style="padding: 5px;">%(date)s</td>\
+	 	</tr><tr><td><b>No. Of Tickets</b></td><td style="padding: 5px;" \
+	 	align="right">%(value)s</td></tr><tr><td><b>Ticket ID"s</b></td>\
+	 	<td style="padding: 5px;">%(name)s</td></tr></table>'
+
+	 	return repl(html, {
+	 		label:label,
+	 		date: dateutil.obj_to_user(new Date(x)),
+	 		value: format_number(y, null, 0),
+	 		name: names
+	 	})
 	},
 	get_plot_options: function() {
 		return {
+			colors: this.get_legend_colors(),
 			grid: { hoverable: true, clickable: true },
 			xaxis: { mode: "time",
 				min: dateutil.str_to_obj(this.page.fields_dict.start.get_parsed_value()).getTime(),
@@ -253,31 +252,53 @@ helpdesk.DashboardGridView = Class.extend({
 			series: { downsample: { threshold: 1000 } }
 		}
 	},
+	get_legend_colors: function(){
+		status = this.status.get_parsed_value();
+		open_tkt = "rgb(237,194,64)";
+		closed_tkt = "rgb(203,75,75)";
+		pending_tkt = "rgb(175,216,248)";
+		colors = [open_tkt, closed_tkt, pending_tkt];
+		
+		if(status == "Pending")
+			colors = [pending_tkt];
+		else if(status == "Closed")
+			colors = [closed_tkt];
+		else if(status == "Open")
+			colors = [open_tkt];
+		return colors
+	},
 	check_mandatory_fields: function(){
 		start = this.page.fields_dict.start.get_parsed_value()
 		end = this.page.fields_dict.end.get_parsed_value()
 
-		if(!(start && end)){
-			frappe.throw("From Date and To Date are mandatory");
+		if(!(start || end)){
+			frappe.msgprint("From Date and To Date are mandatory", "Validate Error");
+			return false
 		}
 		else if(!start){
-			frappe.throw("From Date is mandatory");
+			frappe.msgprint("From Date is mandatory", "Validate Error");
+			return false
 		}
 		else if(!end){
-			frappe.throw("To Date is mandatory");
+			frappe.msgprint("To Date is mandatory", "Validate Error");
+			return false
 		}
+		else
+			return true
 	},
 	validate_fields_and_refresh: function(me){
-		this.check_mandatory_fields();
-
-		start = new Date(this.page.fields_dict.start.get_parsed_value());
-		end = new Date(this.page.fields_dict.end.get_parsed_value());
-		dept = this.page.fields_dict.department.get_parsed_value();
-		status = this.page.fields_dict.status.get_parsed_value();
-
-		if(end < start){
-			frappe.throw("To Date must be greater than From Date");
+		if(this.check_mandatory_fields()){
+			start = new Date(this.page.fields_dict.start.get_parsed_value());
+			end = new Date(this.page.fields_dict.end.get_parsed_value());
+			dept = this.page.fields_dict.department.get_parsed_value();
+			status = this.page.fields_dict.status.get_parsed_value();
+	
+			if(end < start){
+				frappe.msgprint("To Date must be greater than From Date", "Validate Error");
+			}
+			else{
+				this.refresh();
+			}
 		}
-		this.refresh();
 	}
 });
