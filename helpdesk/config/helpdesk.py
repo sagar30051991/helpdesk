@@ -9,6 +9,11 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
+					"name": "ToDo",
+					"description": _("ToDo"),
+				},
+				{
+					"type": "doctype",
 					"name": "Issue",
 					"description": _("Support queries from employees."),
 				},

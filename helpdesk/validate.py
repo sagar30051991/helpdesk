@@ -13,8 +13,8 @@ def validate_request():
 	cmd = frappe.local.form_dict.cmd
 	method = cmd.split(".")[2] if cmd != "login" else cmd
 
-	validate_request_parameters(method, args)
 	if method != "login": validate_user_against_session_id(args)
+	validate_request_parameters(method, args)
 
 def validate_url():
 	parts = frappe.request.path[1:].split("/")
@@ -91,14 +91,13 @@ def validate_fields_length_and_type(fields_dict, args):
 		if len_exceeded:
 			raise Exception(
 					"Request parameters length exceeded for following field(s) : {0}".format(",".join(len_exceeded))
-					)
+				)
 
 def validate_login_request(args):
-	# raise Exception("not yet implemented")
+	# TODO
 	pass
 
 def validate_report_issue_request(args):
-	# raise Exception("not yet implemented")
 	try:
 		issue = is_issue_already_exists(args)
 		if not issue:
@@ -112,7 +111,6 @@ def validate_report_issue_request(args):
 		raise e
 
 def validate_get_issue_status_request(args):
-	# raise Exception("not yet implemented")
 	try:
 		if not does_issue_exists(args.get("ticket_id")):
 			raise Exception("{0} Support Ticket Does Not Exists".format(args.get("ticket_id")))
@@ -124,7 +122,6 @@ def validate_get_issue_status_request(args):
 		raise e
 
 def validate_get_list_request(args):
-	# raise Exception("not yet implemented")
 	if not check_user_permission(args):
 		raise Exception("User don't have permissions to access the ticket".format(args.get("ticket_id")))
 
@@ -137,7 +134,6 @@ def validate_get_list_request(args):
 	frappe.local.form_dict.args = json.dumps(args)
 
 def validate_update_issue_request(args):
-	# raise Exception("not yet implemented")
 	try:
 		if not does_issue_exists(args.get("ticket_id")):
 			raise Exception("{0} Support Ticket Does Not Exists".format(args.get("ticket_id")))
@@ -169,10 +165,20 @@ def validate_update_issue_request(args):
 		raise e
 
 def validate_delete_issue_request(args):
-	raise Exception("not yet implemented")
+	# TODO
+	pass
 
 def validate_issue_history_request(args):
-	raise Exception("not yet implemented")
+	try:
+		tes = frappe.db.get_value("Ticket Escalation History", {"ticket_id":args.get("ticket_id")}, "name")
+		if tes:
+			is_valid_user(args.get("user"))
+			if not check_user_permission(args, ptype="read"):
+				raise Exception("User don't have permissions to read the ticket escalation history")
+		else: 
+			raise Exception("Ticket Escalation History not found for support ticket : {0}".format(args.get("ticket_id")))
+	except Exception, e:
+		raise e
 
 def is_valid_user(email):
 	user = frappe.db.get_value("User", {"email":email}, ["email","enabled", "first_name"], as_dict=True)
@@ -182,8 +188,7 @@ def is_valid_user(email):
 		raise Exception("{0}'s Profile has been disabled, Please contact Administrator".format(user.get("first_name")))
 	# TODO check if support user ??
 	else:
-		# valid user
-		return True
+		return True			# valid user
 
 def is_valid_department(department):
 	if not frappe.db.get_value("Department", department, "name") == department:

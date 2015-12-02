@@ -82,14 +82,12 @@ def getIssueList(args):
 							"modified"
 						])
 		}
-		print "_fields", _fields
 		args.update(_fields)
 		query = """ SELECT %(fields)s FROM `tabIssue` WHERE %(condition)s ORDER BY 
 					%(sort_by)s %(order_by)s LIMIT %(limit)s"""%(args)
 		issues = frappe.db.sql(query, as_dict=True, debug=True)
 		result = {
 			"total_records": len(issues),
-			# "Issues":[issue for issue in issues]
 			"issues": issues
 		}
 	except Exception, e:
@@ -118,8 +116,35 @@ def updateIssue(args):
 def getIssueHistory(args):
 	try:
 		result = True
+		tes_dn = frappe.db.get_value("Ticket Escalation History", {"ticket_id":args.get("ticket_id")}, "name")
+		tes = frappe.get_doc("Ticket Escalation History", tes_dn)
+
+		escalation_record = {}
+		for r in tes.items:
+			escalation_record.update({
+				r.idx: {
+					"assigned_to": r.assigned_to,
+					"assigned_by": r.assigned_by,
+					"todo_id": r.todo,
+					"todo_status": r.todo_status,
+					"due_date": r.due_date
+				}
+			})
+
+		result = {
+			"ticket_id": tes.ticket_id,
+			"status": tes.status,
+			"opening_date": tes.opening_date,
+			"opening_time": tes.opening_time,
+			"is_assigned": tes.is_assigned,
+			"currently_assigned_to": tes.current_owner,
+			"currently_assigned_to_role": tes.current_role,
+			"assigned_to_date": tes.assigned_on,
+			"escalation_record": escalation_record,
+			"escalation_history_id": tes.name
+		}
 	except Exception, e:
-		raise Exception("Not Yet Implemented")
+		raise Exception("Error while fetching support ticket history")
 	finally:
 		return result
 

@@ -17,7 +17,8 @@ def issue_on_update(doc, method):
 
 def issue_on_trash(doc, method):
 	# TODO
-	print "on transh"
+	esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.name},"name")
+	frappe.db.set_value("Ticket Escalation History", esc_name, "status", "Deleted")
 
 
 def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=None):
