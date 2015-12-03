@@ -16,7 +16,7 @@ def issue_on_update(doc, method):
 	create_update_escalation_history(doc, esc_name=esc_name)
 
 def issue_on_trash(doc, method):
-	# TODO
+	# TODO check
 	esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.name},"name")
 	frappe.db.set_value("Ticket Escalation History", esc_name, "status", "Deleted")
 
@@ -87,7 +87,3 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	esc.current_owner = todo.owner
 	esc.current_role = todo.role
 	esc.save(ignore_permissions=True)
-
-# def get_user_role(user):
-# 	return "Support Team"
-# 	# TODO get role high priority role

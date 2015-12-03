@@ -1,13 +1,3 @@
-
-// frappe.ui.form.on("ToDo", "reference_type", function(frm){
-// 	if(cur_frm.doc.reference_type == "Issue")
-// 		set_fields_to_mandatory(true);
-// 	else
-// 		set_fields_to_mandatory(false);
-
-// 	// cur_frm.doc.reference_type?set_fields_to_mandatory(true):set_fields_to_mandatory(false)
-// })
-
 frappe.ui.form.on("ToDo", {
 	reference_type: function(frm){
 		check_and_toggle_reqd();

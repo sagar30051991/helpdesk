@@ -48,7 +48,7 @@ def validate_assigned_by(doc):
 				FROM
 				    `tabRole Priority` rp
 				WHERE
-				    rp.role IN (%s)"""%(["'%s'"%(role) for role in get_roles(doc.assigned_by)]])
+				    rp.role IN (%s)"""%(["'%s'"%(role) for role in get_roles(doc.assigned_by)])
 	
 	assigned_by_priority = frappe.db.sql(query, as_list=True)[0][0]
 	owner_priority = get_role_priority(doc.role)

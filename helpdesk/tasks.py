@@ -1,6 +1,7 @@
 import frappe
 import pymssql
 
+from datetime import timedelta
 from utils import send_mail, create_scheduler_log
 from frappe.utils import get_datetime, time_diff_in_hours
 
@@ -157,7 +158,7 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
     """
     current_role = record.get("current_role")
 
-    query = """ SELECT idx, role FROM `tabTicket Escalation Settings Record` WHERE 
+    query = """ SELECT idx, role, time, parent FROM `tabTicket Escalation Settings Record` WHERE 
                 idx=(SELECT idx FROM `tabTicket Escalation Settings Record`
                 WHERE parent='{parent}' AND role='{role}')-1 and parent='{parent}'""".format(
                     parent=esc_setting.name,
@@ -169,6 +170,7 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
         frappe.throw("could not find higher role in escalation settings")
     else:
         next_role = higher_auth.get("role")
+        time = higher_auth("time")
         idx = higher_auth.get("idx")
 
         # check if department wise escalation is enabled
@@ -182,7 +184,7 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
         #     frappe.throw("Can not find any users to whom ticket can be escalate")
         user = users[0]
         # check if todo is created for the user if yes then update else create new
-        create_update_todo_for_user(user, next_role, record.get("ticket_id"))
+        create_update_todo_for_user(user, next_role, time, record.get("ticket_id"))
 
 def get_tickets_details_that_cant_be_escalate(records):
     """get tickets details that cant be escalate"""
@@ -223,7 +225,7 @@ def get_department_head_user(dept):
     user = frappe.db.sql(query, as_dict=True)[0]
     return user.get("name")
 
-def create_update_todo_for_user(user, role, issue):
+def create_update_todo_for_user(user, role, time, issue):
     desc = "[Escalated][Support Ticket]"
     desc += "Support Ticket : %s has been escalated to you"%(issue)
 
@@ -248,7 +250,10 @@ def create_update_todo_for_user(user, role, issue):
     todo.reference_name = issue
     todo.role = role
     todo.assigned_by = "Administrator"
-    # TODO assign due date, priority, 
+    # TODO check-> assign due date, priority
+    due_date = get_datetime().now() + timedelta(hours=time)
+    todo.due_date = due_date.date()
+    todo.due_time = due_date.time().strftime("%H:%M:%S")
 
 def select_user_to_escalate_ticket(next_role, is_dept_escalation, record):
     """

@@ -32,6 +32,7 @@ def get_support_ticket_data(args):
 
 	"""
 	# TODO check permissions
+	# only fetch the issue whose issue->owner or todo->[owner or assigned by] is user
 	args = json.loads(args)
 	query = build_query(args)
 	
@@ -52,38 +53,47 @@ def build_query(filters):
 		condition = ""
 		status = ""
 		department = ""
-		date_type = "opening_date"
+		date_type = "i.opening_date"
 
 		# status
 		if filters.get("status") != "All":
 			if filters.get("status") == ("Pending"):
-				status = "AND status NOT IN ('Open', 'Closed')"
+				status = "AND i.status NOT IN ('Open', 'Closed')"
 			else:
-				status = "AND status='%s'"%(filters.get("status"))
-			date_type = "resolution_date" if filters.get("status") == "Closed" else "opening_date"
+				status = "AND i.status='%s'"%(filters.get("status"))
+			date_type = "i.resolution_date" if filters.get("status") == "Closed" else "i.opening_date"
+
 		# order by
 		order_by = "ORDER BY {field} ASC".format(field=date_type)
 		# department
 		if filters.get("dept"):
-			department = "AND department='%s'"%(filters.get("dept"))
-		# date conditions
-		condition = "WHERE {field} BETWEEN '{start}' AND '{end}' {dept} {status} {order_by}".format(
+			department = "AND i.department='%s'"%(filters.get("dept"))
+
+		names = "AND i.name IN (SELECT t.reference_name FROM tabToDo AS t WHERE (t.owner='{user}' AND t.status='Open') \
+			OR t.assigned_by='{user}' AND t.reference_type='Issue' AND t.reference_name=i.name) OR i.owner='{user}'".format(
+				user=filters.get("user")
+			)
+		
+		condition = "WHERE {field} BETWEEN '{start}' AND '{end}' {names} {dept} {status} {order_by}".format(
 				field=date_type,
 				start=filters.get("start"),
 				end=filters.get("end"),
 				dept=department,
 				status=status,
-				order_by=order_by
+				order_by=order_by,
+				names=names
 			)
 
 		return condition
 
-	return """	SELECT
-					name, status,
-					opening_time, resolution_date,
-					opening_date
+	return """	SELECT DISTINCT
+					i.name, i.status,
+					i.opening_time, i.resolution_date,
+					i.opening_date
 				FROM
-					`tabIssue` {conditions}""".format(conditions=build_conditions(filters))
+					`tabIssue` AS i,
+					`tabToDo` AS t
+					{conditions}""".format(conditions=build_conditions(filters))
 
 def datetime_to_time(dt):
 	import datetime, time
@@ -218,3 +228,6 @@ def get_names_as_html_string(names):
 		total = len(names) - 2
 		names.append("and 2 more")
 	return "<br>".join([r for r in names])
+
+# def get_allowed_issue_names_query(user):
+# 	query = """SELECT name FROM tabIssue"""
