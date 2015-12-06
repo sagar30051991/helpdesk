@@ -54,9 +54,9 @@ app_version = "0.0.1"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Issue": "helpdesk.py.issue.get_permission_query_conditions",
+}
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
@@ -89,12 +89,12 @@ scheduler_events = {
 	"all": [
 		"helpdesk.tasks.sync_db"
 	],
-	# "daily": [
-	# 	"helpdesk.tasks.daily"
-	# ],
 	"hourly": [
 		"helpdesk.tasks.ticket_escallation"
 	],
+	# "daily": [
+	# 	"helpdesk.tasks.daily"
+	# ],
 	# "weekly": [
 	# 	"helpdesk.tasks.weekly"
 	# ]

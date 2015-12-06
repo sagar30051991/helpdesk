@@ -91,8 +91,7 @@ def build_query(filters):
 					i.opening_time, i.resolution_date,
 					i.opening_date
 				FROM
-					`tabIssue` AS i,
-					`tabToDo` AS t
+					`tabIssue` AS i
 					{conditions}""".format(conditions=build_conditions(filters))
 
 def datetime_to_time(dt):
