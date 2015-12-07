@@ -4,7 +4,7 @@
  "docstatus": 0, 
  "doctype": "Page", 
  "icon": "octicon octicon-briefcase", 
- "modified": "2015-11-17 11:45:06.167359", 
+ "modified": "2015-12-07 16:16:50.381323", 
  "modified_by": "Administrator", 
  "module": "HelpDesk", 
  "name": "dashboard", 
@@ -12,7 +12,7 @@
  "page_name": "dashboard", 
  "roles": [
   {
-   "role": "Administrator"
+   "role": "All"
   }
  ], 
  "script": null, 

@@ -1,6 +1,58 @@
 [
  {
   "default_value": null, 
+  "doc_type": "Issue", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "naming_series", 
+  "modified": "2015-11-25 19:52:34.267245", 
+  "name": "Issue-naming_series-options", 
+  "property": "options", 
+  "property_type": "Text", 
+  "value": "ISS-"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "User", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "department", 
+  "modified": "2015-11-27 11:51:36.976862", 
+  "name": "User-department-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "last_name"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "ToDo", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2015-11-27 14:46:59.499099", 
+  "name": "ToDo-_idx", 
+  "property": "_idx", 
+  "property_type": "Text", 
+  "value": "[\"section_break_6\", \"reference_type\", \"reference_name\", \"column_break_10\", \"role\", \"assigned_by\", \"sender\", \"description_and_status\", \"owner\", \"description\", \"column_break_2\", \"status\", \"priority\", \"date\"]"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "ToDo", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "due_time", 
+  "modified": "2015-11-27 18:34:40.659623", 
+  "name": "ToDo-due_time-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "date"
+ }, 
+ {
+  "default_value": null, 
   "doc_type": "Quotation", 
   "docstatus": 0, 
   "doctype": "Property Setter", 
@@ -361,6 +413,45 @@
   "name": "Supplier-naming_series-hidden", 
   "property": "hidden", 
   "property_type": "Check", 
+  "value": "1"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Issue", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "department", 
+  "modified": "2015-11-30 14:23:39.480862", 
+  "name": "Issue-department-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "subject"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "ToDo", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2015-12-02 15:06:14.030408", 
+  "name": "ToDo-read_only_onload", 
+  "property": "read_only_onload", 
+  "property_type": "Check", 
+  "value": null
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "ToDo", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "date", 
+  "modified": "2015-12-02 15:06:14.142983", 
+  "name": "ToDo-date-permlevel", 
+  "property": "permlevel", 
+  "property_type": "Int", 
   "value": "1"
  }
 ]
