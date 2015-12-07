@@ -14,19 +14,6 @@
  }, 
  {
   "default_value": null, 
-  "doc_type": "User", 
-  "docstatus": 0, 
-  "doctype": "Property Setter", 
-  "doctype_or_field": "DocField", 
-  "field_name": "department", 
-  "modified": "2015-11-27 11:51:36.976862", 
-  "name": "User-department-previous_field", 
-  "property": "previous_field", 
-  "property_type": "Data", 
-  "value": "last_name"
- }, 
- {
-  "default_value": null, 
   "doc_type": "ToDo", 
   "docstatus": 0, 
   "doctype": "Property Setter", 
@@ -453,5 +440,18 @@
   "property": "permlevel", 
   "property_type": "Int", 
   "value": "1"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "User", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "department", 
+  "modified": "2015-12-07 16:37:03.448216", 
+  "name": "User-department-previous_field", 
+  "property": "previous_field", 
+  "property_type": "Data", 
+  "value": "last_name"
  }
 ]
