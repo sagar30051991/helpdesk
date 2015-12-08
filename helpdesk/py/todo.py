@@ -34,7 +34,7 @@ def validate_due_date(doc):
 				AND er.role='%s'
 				AND tes.is_default=1"""%(doc.role or "Administrator")
 
-	result = frappe.db.sql(query, as_dict=True, debug=True)
+	result = frappe.db.sql(query, as_dict=True)
 	if not result:
 		frappe.throw("Can not find the Role in Escalation Settings")
 	else:

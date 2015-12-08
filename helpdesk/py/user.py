@@ -28,8 +28,10 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 	highest_role = get_highest_role(frappe.session.user)
 	query = ""
 	roles = []
+	dept = ""
 	if highest_role == "Administrator":
 		roles = ["Department Head"]
+		dept = "AND usr.department='{dept}'".format(dept=frappe.db.get_value("Issue",filters.get("issue"),"department"))
 	else:
 		priority = get_role_priority(highest_role).get("priority")
 		roles = frappe.db.sql("select role from `tabRole Priority` where priority < %s"%(priority), as_list=True)
@@ -52,7 +54,8 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 				AND ifnull(enabled, 0)=1
 				AND usr.docstatus < 2
 				AND usr.name NOT IN ({standard_users})
-				AND usr.user_type != 'Website User'""".format(
+				AND usr.user_type != 'Website User' {dept}""".format(
 					roles=",".join(["'%s'"%(role) for role in roles]),
-					standard_users=", ".join(["'%s'"%(role) for role in STANDARD_USERS]))
+					standard_users=", ".join(["'%s'"%(role) for role in STANDARD_USERS]),
+					dept=dept)
 	return frappe.db.sql(query)
