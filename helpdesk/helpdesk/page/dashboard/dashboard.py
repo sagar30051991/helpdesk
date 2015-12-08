@@ -69,10 +69,22 @@ def build_query(filters):
 		if filters.get("dept"):
 			department = "AND i.department='%s'"%(filters.get("dept"))
 
-		names = "AND i.name IN (SELECT t.reference_name FROM tabToDo AS t WHERE (t.owner='{user}' AND t.status='Open') \
-			OR t.assigned_by='{user}' AND t.reference_type='Issue' AND t.reference_name=i.name) OR i.owner='{user}'".format(
-				user=filters.get("user")
-			)
+		# TODO system manager, Administrator, Department Head ticket filters
+		names = ""
+		if "System Manager" in frappe.get_roles(filters.get("user")):
+			names = ""
+		elif "Department Head" in frappe.get_roles(filters.get("user")):
+			names = "AND i.department='{dept}' AND i.name IN (SELECT t.reference_name FROM tabToDo AS t WHERE \
+				(t.owner='{user}' AND t.status='Open') OR t.assigned_by='{user}' AND t.reference_type='Issue' \
+				AND t.reference_name=i.name) OR i.owner='{user}'".format(
+					user=filters.get("user"),
+					dept=frappe.db.get_value("User", filters.get("user"), "department")
+				)
+		else:
+			names = "AND i.name IN (SELECT t.reference_name FROM tabToDo AS t WHERE (t.owner='{user}' AND t.status='Open') \
+				OR t.assigned_by='{user}' AND t.reference_type='Issue' AND t.reference_name=i.name) OR i.owner='{user}'".format(
+					user=filters.get("user")
+				)
 		
 		condition = "WHERE {field} BETWEEN '{start}' AND '{end}' {names} {dept} {status} {order_by}".format(
 				field=date_type,
@@ -223,9 +235,9 @@ def get_data_in_flot_format(start, end, status, records):
 
 def get_names_as_html_string(names):
 	if len(names) > 2:
-		names = names[:2]
 		total = len(names) - 2
-		names.append("and 2 more")
+		names = names[:2]
+		names.append("and {0} more".format(total))
 	return "<br>".join([r for r in names])
 
 # def get_allowed_issue_names_query(user):

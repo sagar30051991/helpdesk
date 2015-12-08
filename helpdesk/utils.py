@@ -23,7 +23,7 @@ def is_valid_datetime(val, date_format):
 	try:
 		strptime(val, date_format)
 	except Exception, e:
-		raise Exception("Invalid date value format")
+		raise Exception("Invalid date value format, Date format should be : {0}".format(date_format))
 
 def autoname_todo(doc, method):
     from frappe.naming import make_autoname

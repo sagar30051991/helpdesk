@@ -85,7 +85,7 @@ def getIssueList(args):
 		args.update(_fields)
 		query = """ SELECT %(fields)s FROM `tabIssue` WHERE %(condition)s ORDER BY 
 					%(sort_by)s %(order_by)s LIMIT %(limit)s"""%(args)
-		issues = frappe.db.sql(query, as_dict=True, debug=True)
+		issues = frappe.db.sql(query, as_dict=True)
 		result = {
 			"total_records": len(issues),
 			"issues": issues
