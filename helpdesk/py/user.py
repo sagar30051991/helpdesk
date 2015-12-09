@@ -24,14 +24,18 @@ STANDARD_USERS = ["Guest", "Administrator"]
 
 def user_query(doctype, txt, searchfield, start, page_len, filters):
 	from helpdesk.py.todo import get_highest_role, get_role_priority
-	
+
 	highest_role = get_highest_role(frappe.session.user)
 	query = ""
 	roles = []
 	dept = ""
 	if highest_role == "Administrator":
 		roles = ["Department Head"]
-		dept = "AND usr.department='{dept}'".format(dept=frappe.db.get_value("Issue",filters.get("issue"),"department"))
+		if isinstance(filters.get("issue"), list):
+			dept = validate_multiple_issue_name(filters.get("issue"))
+		else:
+			dept = frappe.db.get_value("Issue",filters.get("issue"),"department")
+		dept = "AND usr.department='{dept}'".format(dept=dept)
 	else:
 		priority = get_role_priority(highest_role).get("priority")
 		roles = frappe.db.sql("select role from `tabRole Priority` where priority < %s"%(priority), as_list=True)
@@ -59,3 +63,16 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 					standard_users=", ".join(["'%s'"%(role) for role in STANDARD_USERS]),
 					dept=dept)
 	return frappe.db.sql(query)
+
+def validate_multiple_issue_name(names):
+	query = """SELECT DISTINCT department FROM `tabIssue` WHERE name IN ({names})""".format(
+				names=",".join(["'%s'"%(name) for name in names])
+			)
+	records = frappe.db.sql(query, as_list=True)
+	departments = list(set([r[0] for r in records]))
+	if not departments:
+		frappe.throw("Department field is missing in select Support Ticket")
+	elif len(departments) > 1:
+		frappe.throw("Can not filter users more than one different departments detected")
+	else:
+		return departments[0]
