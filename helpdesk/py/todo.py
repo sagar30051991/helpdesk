@@ -12,16 +12,25 @@ def validate_due_date(doc):
 	# get the time limit for the role from escalation settings
 	if doc.status == "Closed":
 		return
+
 	now = get_datetime().now()
 	datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
-	datetime_str = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
+	datetime_str = datetime.strptime(datetime_str.split(".")[0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
 	now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
 	if time_diff_in_hours(datetime_str, now_str) < 0:
 		frappe.throw("Can not assign past date")
-	
-	# current user highest role in doc.role
-	doc.role = get_highest_role(frappe.session.user)
+
+	creation = datetime.strptime(doc.creation, "%Y-%m-%d %H:%M:%S.%f")
+
+	if creation.replace(microsecond=0) == now.replace(microsecond=0):
+		# current user highest role in doc.role
+		if doc.assigned_by == frappe.session.user:
+			doc.role = get_highest_role(frappe.session.user)
+			doc.assigned_to_role = get_highest_role(doc.owner)
+		else:
+			doc.role = get_highest_role(doc.assigned_by)
+			doc.assigned_to_role = get_highest_role(doc.owner)
 
 	query = """	SELECT
 				    er.time
@@ -39,13 +48,17 @@ def validate_due_date(doc):
 		frappe.throw("Can not find the Role in Escalation Settings")
 	else:
 		time = result[0].get("time")
-
-		datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
-		time_diff = time_diff_in_hours(datetime_str, str(now))
-		
-		if time < time_diff:
-			dttm = (now + timedelta(hours=time)).strftime("%d-%m-%Y %H:%M:%S")
-			frappe.throw("Invalid Due Date and Time, Due Date & time shoud be : %s"%(dttm))
+		if creation.replace(microsecond=0) == now.replace(microsecond=0):
+			due_dttm = now + timedelta(hours=time)
+			doc.due_time = due_dttm.strftime("%H:%M:%S")
+			doc.date = due_dttm.strftime("%Y-%m-%d ")
+		else:
+			datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
+			time_diff = time_diff_in_hours(datetime_str, str(now))
+			
+			if time < time_diff:
+				dttm = (now + timedelta(hours=time)).strftime("%d-%m-%Y %H:%M:%S")
+				frappe.throw("Invalid Due Date and Time, Due Date & time shoud be : %s"%(dttm))
 
 def validate_assigned_by(doc):
 	"""Do not allow low authority user to assign ticket to higher authority"""

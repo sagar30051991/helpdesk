@@ -40,7 +40,6 @@ def send_mail(args, subject):
         args.update({
         	"fullname": get_user_fullname(args.get("user")) or "Guest"
         })
-
         frappe.sendmail(recipients=args.get("email"), sender=sender, subject=subject,
             message=frappe.get_template(template).render(args))
 
@@ -91,7 +90,36 @@ def create_scheduler_log(err_msg, err_traceback, method):
     se.error = "%s\n%s"%(err_msg, err_traceback)
     se.save(ignore_permissions=True)
 
+def get_dept_head_user(dept):
+    query = """ SELECT
+                    ur.parent
+                FROM
+                    tabUserRole ur
+                JOIN
+                    tabUser u
+                ON
+                    ur.parent=u.name
+                WHERE
+                    ur.role="Department Head"
+                AND u.department='{dept}'
+            """.format(dept=dept)
+    return frappe.db.sql(query, as_list=True)[0][0]
+
+def get_users_email_ids(users):
+    query = """ SELECT 
+                    email
+                FROM
+                    tabUser
+                WHERE
+                    name IN ({users})
+            """.format(users=",".join(["'%s'"%(user) for user in users]))
+    emails = frappe.db.sql(query, as_list=True)
+    if emails:
+        return [email[0] for email in emails]
+
 email_templates = {
 	"open_tickets": "templates/email/open_ticket_template.html",
-	"new_ticket": "templates/email/new_ticket_template.html"
+	"new_ticket": "templates/email/new_ticket_template.html",
+    "escalate_ticket": "templates/email/escalate_ticket_template.html",
+    "cant_escalate_tickets": "templates/email/cant_escalate_ticket_template.html"
 }

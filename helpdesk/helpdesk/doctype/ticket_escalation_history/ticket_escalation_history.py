@@ -62,6 +62,10 @@ def todo_on_update(doc, method):
 		esc_name = frappe.db.get_value("Ticket Escalation History",{"ticket_id":doc.reference_name}, "name")
 		create_update_escalation_record(todo=doc, esc_name=esc_name)
 
+def todo_on_trash(doc, method):
+	# TODO
+	pass
+
 def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	if not todo:
 		todo = frappe.get_doc("ToDo", todo_name)
@@ -83,7 +87,8 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 	entry.todo_status = todo.status
 	entry.due_date = todo.date
 	esc.is_assigned = 1
+	# esc.assigned_on = get_datetime("{date} {time}".format(date=todo.date, time=todo.due_time))
 	esc.assigned_on = get_datetime()
 	esc.current_owner = todo.owner
-	esc.current_role = todo.role
+	esc.current_role = todo.assigned_to_role
 	esc.save(ignore_permissions=True)

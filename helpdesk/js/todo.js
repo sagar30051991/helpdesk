@@ -21,6 +21,7 @@ function check_and_toggle_reqd(){
 
 function set_fields_to_mandatory(is_mandatory){
 	cur_frm.toggle_reqd("role", is_mandatory);
+	cur_frm.toggle_reqd("assigned_to_role", is_mandatory);
 	cur_frm.toggle_reqd("assigned_by", is_mandatory);
 	cur_frm.toggle_reqd("reference_name", is_mandatory);
 	cur_frm.toggle_reqd("date", is_mandatory);

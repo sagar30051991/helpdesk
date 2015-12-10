@@ -82,6 +82,7 @@ def get_open_tickets_details(user, tkts_list):
         tickets.update({
             idx: [idx, doc.name, doc.subject, doc.department, str(doc.opening_date), str(doc.opening_time)]
         })
+        idx += 1
 
     args.update({
         "user": user,
@@ -116,15 +117,15 @@ def check_and_escalate_assigned_tickets(records, esc_setting):
     for record in records:
         datetime_str = record.get("assigned_on")
         now = str(get_datetime().now())
-        time = get_time_difference(esc_setting, record.get("current_role"))
-        
-        if time_diff_in_hours(now, datetime_str) >= time or 2:
+        time = get_time_difference(esc_setting, record.get("current_role")) or 2
+
+        if time_diff_in_hours(now, datetime_str) >= time:
             ch_entry = esc_setting.escalation_hierarchy
-            if ch_entry[0].role == record.current_role:
-                key = frappe.db.get_value("Ticket Escalation History", record.get("ticket_id"), "department")
-                val = rec_cant_be_escalate.get(department).append(record) if rec_cant_be_escalate.get(department) else [record]
+            if record.current_role in [ch.role for ch in ch_entry[:2]]:
+                key = frappe.db.get_value("Issue", record.get("ticket_id"), "department")
+                val = rec_cant_be_escalate.get("department").append(record) if rec_cant_be_escalate.get("department") else [record]
                 rec_cant_be_escalate.update({
-                    key: val
+                    key: val,
                 })
             else:
                 escalate_ticket_to_higher_authority(esc_setting, record)
@@ -137,7 +138,7 @@ def check_and_escalate_assigned_tickets(records, esc_setting):
 
 def get_time_difference(esc_setting, role="Administrator"):
     """checking the time limit for perticuler role"""
-    roles = [for ch in esc_setting.escalation_hierarchy]
+    roles = [ch.role for ch in esc_setting.escalation_hierarchy]
     ch_entry = esc_setting.escalation_hierarchy
     if not ch_entry:
         frappe.throw("Invalid Escalation Settings Records")
@@ -156,7 +157,10 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
     """
         TODO Escalate ticket to higher authority
     """
-    current_role = record.get("current_role")
+    from utils import get_users_email_ids
+
+    prev_role = record.get("current_role")
+    prev_owner = record.get("current_owner")
 
     query = """ SELECT idx, role, time, parent FROM `tabTicket Escalation Settings Record` WHERE 
                 idx=(SELECT idx FROM `tabTicket Escalation Settings Record`
@@ -164,48 +168,60 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
                     parent=esc_setting.name,
                     role=record.get("current_role")
                 )
-    higher_auth = frappe.db.sql(query, as_dict=True)
-    
+    higher_auth = frappe.db.sql(query, as_dict=True)[0]
+        
     if not higher_auth:
         frappe.throw("could not find higher role in escalation settings")
     else:
+        user = None
         next_role = higher_auth.get("role")
-        time = higher_auth("time")
+        time = higher_auth.get("time")
         idx = higher_auth.get("idx")
 
         # check if department wise escalation is enabled
-        users = None
-        if esc_setting.escalation_hierarchy[idx+1].is_dept_escalation:
-            user = select_user_to_escalate_ticket(next_role, True, record)
-        else:
-            user = select_user_to_escalate_ticket(next_role, False, record)
-
-        # if not users:
-        #     frappe.throw("Can not find any users to whom ticket can be escalate")
-        user = users[0]
+        is_dept_escalation = True if esc_setting.escalation_hierarchy[idx-1].is_dept_escalation else False
+        result = select_user_to_escalate_ticket(next_role, is_dept_escalation, record)
+        
+        user = result.get("user")
+        next_role = result.get("role") if result.get("role") else next_role
         # check if todo is created for the user if yes then update else create new
         create_update_todo_for_user(user, next_role, time, record.get("ticket_id"))
+        # notify user regarding ticket escalation
+        args = {
+            "user": "User",
+            "email": get_users_email_ids([prev_owner, user]),
+            "action": "escalate_ticket",
+            "issue": frappe.get_doc("Issue", record.get("ticket_id")),
+            "esc": {
+                "prev_owner": prev_owner,
+                "prev_role": prev_role,
+                "current_owner": user,
+                "current_role": next_role
+            }
+        }
+        send_mail(args, "[HelpDesk][Ticket Escalation] HelpDesk Notifications")
 
 def get_tickets_details_that_cant_be_escalate(records):
     """get tickets details that cant be escalate"""
-    from utils import build_table
+    from utils import build_table, get_dept_head_user
 
     args = {}
     for dept,record in records.iteritems():
         tickets = {
             "head": ["SR", "Ticket ID", "Subject", "Department", "Opening Date & Time", "Assigned To", "Assigned On", "Ticket Status"],
-            "total": len(tkts_list)
+            "total": len(record)
         }
-        
+       
         idx = 1
+
         for tkt in record:
-            doc = frappe.get_doc("Issue", tkt.get(ticket_id))
+            doc = frappe.get_doc("Issue", tkt.get("ticket_id"))
             datetime_str = "{date} {time}".format(date=doc.opening_date, time=doc.opening_time)
             tickets.update({
                 idx: [idx, doc.name, doc.subject, doc.department, datetime_str, tkt.get("current_owner"), tkt.get("assigned_on"), doc.status]
             })
 
-        dept_head = get_dept_head_user(department)
+        dept_head = get_dept_head_user(dept)
 
         args.update({
             dept_head:{
@@ -215,7 +231,6 @@ def get_tickets_details_that_cant_be_escalate(records):
                 "tickets_details": build_table(tickets),
             }
         })
-
     return args
 
 
@@ -238,7 +253,7 @@ def create_update_todo_for_user(user, role, time, issue):
     docname = frappe.db.get_value("ToDo", filters, "name")
     is_new = False
     if not todo:
-        todo = frappe.new_doc("ToDO")
+        todo = frappe.new_doc("ToDo")
         is_new = True
     else:
         todo = frappe.get_doc("ToDo", docname)
@@ -254,6 +269,7 @@ def create_update_todo_for_user(user, role, time, issue):
     due_date = get_datetime().now() + timedelta(hours=time)
     todo.due_date = due_date.date()
     todo.due_time = due_date.time().strftime("%H:%M:%S")
+    todo.save(ignore_permissions=True)
 
 def select_user_to_escalate_ticket(next_role, is_dept_escalation, record):
     """
@@ -280,9 +296,16 @@ def select_user_to_escalate_ticket(next_role, is_dept_escalation, record):
     todo = frappe.db.get_value("ToDo", filters, ["assigned_by", "role"], as_dict=True)
     # TODO handle multiple todos
     if todo and todo.get("role") == next_role:
-        return todo.get("assigned_by")
+        return { "user":todo.get("assigned_by") }
     else:
-        return get_user_from_role(next_role, department=department, is_department=is_department)
+        # return get_user_from_role(next_role, department=department, is_department=is_dept_escalation)
+        user = get_user_from_role(next_role, department=department, is_department=is_dept_escalation)
+        if not user:
+            return {
+                    "user": todo.assigned_by,
+                    "role": todo.role
+                }
+        return { "user":user }
 
 def get_user_from_role(role, department=None, is_department=False):
     query = """ SELECT
@@ -294,11 +317,13 @@ def get_user_from_role(role, department=None, is_department=False):
                 ON
                     usr.name=urole.parent
                 WHERE
-                    urole.role='%s'"""%(role)
+                    urole.role='%s'
+                AND urole.role<>'Administrator'
+            """%(role)
     
     if is_department:
        query = "{query} AND usr.department='{dept}'".format(query=query, dept=department)
-    
+
     users = frappe.db.sql(query, as_dict=True)
     if not users:
         frappe.throw("Can not find any users to whom ticket can be escalate")
@@ -306,4 +331,4 @@ def get_user_from_role(role, department=None, is_department=False):
         return users[0].get("name")
     else:
         #TODO multiple user how to select ?
-        pass
+        return None

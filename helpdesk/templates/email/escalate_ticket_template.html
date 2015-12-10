@@ -1,0 +1,67 @@
+<p>{{_("Dear")}} {{ user }},</p>
+	<p>A Support Ticket has been escalated, please check the Escalation and Support Ticket details</p>
+
+	<p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Ticket Escalation Details</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td align="right">Previously Assigned To : </td>
+					<td>{{ esc.get("prev_owner") }}</td>
+				</tr>
+				<tr>
+					<td align="right">Previously Assigned To User's Role: </td>
+					<td>{{ esc.get("prev_role") }}</td>
+				</tr>
+				<tr><td colspan="2"></td></tr>
+				<tr>
+					<td align="right">Escalated To : </td>
+					<td>{{ esc.get("current_owner") }}</td>
+				</tr>
+				<tr>
+					<td align="right">Escalated To User's Role: </td>
+					<td>{{ esc.get("current_role") }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<br>
+		<table>
+			<thead>
+				<tr><th colspan="2">Ticket Details</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Ticket ID</td>
+					<td>{{ issue.get("name") }}</td>
+				</tr>
+				<tr>
+					<td>Status</td>
+					<td>{{ issue.get("status") }}</td>
+				</tr>
+				<tr>
+					<td>Department</td>
+					<td>{{ issue.get("department") }}</td>
+				</tr>
+				<tr>
+					<td>Opening Date</td>
+					<td>{{ issue.get("opening_date") }}</td>
+				</tr>
+				<tr>
+					<td>Opening Time</td>
+					<td>{{ issue.get("opening_time") }}</td>
+				</tr>
+				<tr>
+					<td>Subject</td>
+					<td>{{ issue.get("subject") }}</td>
+				</tr>
+				<tr>
+					<td>Raised By</td>
+					<td>{{ issue.get("owner") }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</p>
+<p>{{_("Thank you")}},<br>
+{{_("Team HelpDesk")}}</p>
