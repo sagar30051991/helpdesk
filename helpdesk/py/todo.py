@@ -15,6 +15,7 @@ def validate_due_date(doc):
 
 	now = get_datetime().now()
 	datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
+
 	datetime_str = datetime.strptime(datetime_str.split(".")[0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
 	now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 

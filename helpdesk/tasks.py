@@ -185,7 +185,7 @@ def escalate_ticket_to_higher_authority(esc_setting, record):
         user = result.get("user")
         next_role = result.get("role") if result.get("role") else next_role
         # check if todo is created for the user if yes then update else create new
-        create_update_todo_for_user(user, next_role, time, record.get("ticket_id"))
+        create_update_todo_for_user(user, next_role, time, record.get("ticket_id"), prev_owner)
         # notify user regarding ticket escalation
         args = {
             "user": "User",
@@ -240,8 +240,8 @@ def get_department_head_user(dept):
     user = frappe.db.sql(query, as_dict=True)[0]
     return user.get("name")
 
-def create_update_todo_for_user(user, role, time, issue):
-    desc = "[Escalated][Support Ticket]"
+def create_update_todo_for_user(user, role, time, issue, prev_owner):
+    desc = "[Escalated][Support Ticket]\n"
     desc += "Support Ticket : %s has been escalated to you"%(issue)
 
     todo = None
@@ -258,6 +258,14 @@ def create_update_todo_for_user(user, role, time, issue):
     else:
         todo = frappe.get_doc("ToDo", docname)
 
+    filters.update({"owner":prev_owner})
+    dn = frappe.db.get_value("ToDo", filters, "name")
+    if dn:
+        prev_todo = frappe.get_doc("ToDo", dn)
+        prev_todo.status = "Closed"
+        prev_todo.description = "Ticket Escalated to {0}\n{1}".format(role, prev_todo.description)
+        prev_todo.save(ignore_permissions=True)
+
     todo.description = "%s\n\n%s"%(desc, todo.description) if todo.description else desc
     todo.status = "Open"
     todo.owner = user
@@ -267,7 +275,7 @@ def create_update_todo_for_user(user, role, time, issue):
     todo.assigned_by = "Administrator"
     # TODO check-> assign due date, priority
     due_date = get_datetime().now() + timedelta(hours=time)
-    todo.due_date = due_date.date()
+    todo.date = due_date.date()
     todo.due_time = due_date.time().strftime("%H:%M:%S")
     todo.save(ignore_permissions=True)
 
