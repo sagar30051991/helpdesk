@@ -63,7 +63,7 @@ def todo_on_update(doc, method):
 		create_update_escalation_record(todo=doc, esc_name=esc_name)
 
 def todo_on_trash(doc, method):
-	# TODO
+	# ToDo
 	pass
 
 def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
