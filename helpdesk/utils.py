@@ -70,9 +70,9 @@ def build_table(data, has_header=True, is_horizontal=False):
     order = data.get("order")
     for idx in xrange(1, data.get("total") + 1):
         if not is_horizontal:
-            td = "".join(["<td align='center'>%s</td>"%(td) for td in data.get(idx)])
+            td = "".join(["<td align='center' style='padding:3px'>%s</td>"%(td) for td in data.get(idx)])
         else:
-            td = "".join(["<td style='padding:5px' align='%s'>%s</td>"%(
+            td = "".join(["<td style='padding:3px' align='%s'>%s</td>"%(
                                 "right" if i == 0 else "left",
                                 "<b>%s<b>"%(td) if i == 0 else td
                             ) for i,td in enumerate(data.get(idx))])
@@ -80,7 +80,8 @@ def build_table(data, has_header=True, is_horizontal=False):
         records += tr
 
     tbody = "<tbody>%s<tbody>"%(records)
-    table = """<table border="1px" style="border-collapse: collapse;">{thead}{tbody}</table>""".format(thead=thead or "", tbody=tbody)
+    table = """<table border="1px" style="border-collapse: collapse;" width="100%">{thead}{tbody}</table>
+            """.format(thead=thead or "", tbody=tbody)
     
     return table
 
