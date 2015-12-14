@@ -102,6 +102,7 @@ def updateIssue(args):
 	try:
 		issue = frappe.get_doc("Issue", args.get("ticket_id"))
 		set_values(issue, args)
+		issue.save()
 		result = {
 			"ticket_id": issue.name,
 			"display_msg": "Sucessfully Updated Support ticket",
