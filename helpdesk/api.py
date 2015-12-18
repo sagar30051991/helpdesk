@@ -17,4 +17,4 @@ def handle():
 	except Exception, e:
 		import traceback
 		print traceback.format_exc()
-		return get_response(0, str(e))
+		return get_response(message=str(e))

@@ -20,19 +20,19 @@ def execute_cmd(cmd):
 		
 		# check if method is whitelisted
 		if frappe.session['user'] == 'Guest' and (method not in frappe.guest_methods):
-			return get_response(0, "Not Allowed", {"http_status_code":403})
+			return get_response(message="Not Allowed", args={"http_status_code":403})
 		elif not method in frappe.whitelisted:
-			return get_response(0, "Not Allowed", {"http_status_code":403})
+			return get_response(message="Not Allowed", args={"http_status_code":403})
 		else:
 			args = get_json_request(frappe.local.form_dict.args)
 			result = frappe.call(method, args)
 			if result:
 				if isinstance(result, dict):
-					return get_response("Success", 1, result)
+					return get_response(message="Success", status_code=1, args=result)
 				else:
-					return get_response(1, "Success")
+					return get_response(message="Success", status_code=1)
 			else:
-				return get_response(0, "Error occured, Please contact administrator")
+				return get_response(message="Error occured, Please contact administrator")
 	except Exception, e:
 		raise e
 
@@ -56,7 +56,7 @@ def login(args):
 			raise Exception("Invalid Input")
 	except frappe.AuthenticationError,e:
 		# http_status_code = getattr(e, "http_status_code", 500)
-		return get_response("Authentication Error")
+		return get_response(message="Authentication Error")
 
 def manage_user():
 	args = json.loads(frappe.form_dict.args)
