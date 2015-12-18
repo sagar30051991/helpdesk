@@ -144,10 +144,11 @@ def validate_update_issue_request(args):
 			else:
 				# only admin should be able to change the department
 				dept = args.get("department")
+				is_valid_department(dept)
 				if dept and dept != frappe.db.get_value("Issue", args.get("ticket_id"), "department"):
 					if args.get("user") != "Administrator":
-						raise Exception("Only Administrator is allowed to update the department")
-
+						# raise Exception("Only Administrator is allowed to update the department")
+						raise Exception("Invalid department value")
 				# check if user is assigned_to user
 				if frappe.db.get_value("Issue", args.get("ticket_id"), "owner") != args.get("user"):
 					user = frappe.db.get_value(

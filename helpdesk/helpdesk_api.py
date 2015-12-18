@@ -101,6 +101,10 @@ def updateIssue(args):
 	result = {}
 	try:
 		issue = frappe.get_doc("Issue", args.get("ticket_id"))
+		#TODO Need To Confirm
+		if issue.status == "Closed":
+			raise Exception("Can not update the Closed ticket")
+
 		set_values(issue, args)
 		issue.save()
 		result = {
