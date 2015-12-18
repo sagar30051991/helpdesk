@@ -28,6 +28,20 @@ api_request_schema = {
 			}
 		},
 	},
+	"logout":{
+		"fields": {
+			"user":{
+				"is_mandatory": 1,
+				"length": 35,
+				"type": basestring
+			},
+			"sid":{
+				"is_mandatory": 1,
+				"length": 60,
+				"type": basestring
+			}
+		},
+	},
 	"reportIssue":{
 		"fields":{
 			"subject": {
@@ -91,7 +105,7 @@ api_request_schema = {
 			"filter": {
 				"type": dict,
 				"allowed_field": [
-						"resolution_date", "user", "subject", 
+						"resolution_date", "subject", 
 						"ticket_id", "department",
 						"status", "opening_date"
 					],

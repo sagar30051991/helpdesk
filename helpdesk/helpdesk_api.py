@@ -1,4 +1,46 @@
 import frappe
+import json
+from response import get_response
+
+@frappe.whitelist(allow_guest=True)
+def login(args):
+	args = json.loads(args)
+	try: 
+		if args.get("user") and args.get("password"):
+			frappe.clear_cache(user = args["user"])
+			frappe.local.login_manager.authenticate(args["user"],args["password"])
+			frappe.local.login_manager.post_login()
+			return get_response(
+						message="Logged In",
+						status_code=1,
+						args={
+							"sid":frappe.session.sid,
+							"user": args.get("user")
+						}
+					)
+		else:
+			raise Exception("Invalid Input")
+	except frappe.AuthenticationError,e:
+		# http_status_code = getattr(e, "http_status_code", 500)
+		return get_response(message="Authentication Error, Please check user id and password")
+
+@frappe.whitelist(allow_guest=True)
+def logout(args):
+	args = json.loads(args)
+	try: 
+		if args.get("user") and args.get("sid"):
+			manage_user()
+			frappe.local.login_manager.logout()
+			frappe.db.commit()
+			print "hello"
+			return get_response(
+						message="Logged Out",
+						status_code=1,
+					)
+		else:
+			raise Exception("Invalid Input")
+	except frappe.AuthenticationError,e:
+		return get_response(message="Logout unsuccessful")
 
 @frappe.whitelist()
 def reportIssue(args):
@@ -73,7 +115,7 @@ def getIssueList(args):
 	result = {}
 	try:
 		_fields = {
-			"condition":build_condition(args.get("filter")),
+			"condition":build_condition(args),
 			"fields": ",".join([
 							"creation", "opening_date", "owner", "raised_by", 
 							"first_responded_on", "modified_by", "opening_time",
@@ -167,17 +209,43 @@ def set_values(issue, args):
 	issue.description = args.get("description")
 	issue.department = args.get("department")
 
-def build_condition(filters):
+def build_condition(args):
+	filters = args.get("filter")
+	condition = ""
+	field = filters.get("field") if filters.get("field") != "ticket_id" else "name"
+	val = filters.get("value")
+	op = filters.get("operation")
+
 	if filters == "default_filter":
 		return ""
-	else:
-		field = filters.get("field") if filters.get("field") != "ticket_id" else "name"
-		val = filters.get("value")
-		op = filters.get("operation")
+	elif field != "raised_by":
 		if op in ["NOT IN", "IN"]:
-			return "{0} {1} ({2})".format(field, op, ",".join(["'%s'"%(v) for v in val]))
+			condition = "{0} {1} ({2})".format(field, op, ",".join(["'%s'"%(v) for v in val]))
 		else:
-			return "{0}{1}'{2}'".format(field, op, val)
+			condition = "{0}{1}'{2}'".format(field, op, val)
+
+		condition = "raised_by='{user}' AND {cond}".format(user=args.get('user'), cond=condition)
+	else:
+		condition = "{0}{1}'{2}'".format(field, op, val)
+
+	perm = 	"""or (tabIssue.name in (select tabToDo.reference_name from tabToDo where
+			(tabToDo.owner = '{user}' and tabToDo.status = 'Open') or tabToDo.assigned_by = '{user}'
+			and tabToDo.reference_type = 'Issue' and tabToDo.reference_name=tabIssue.name))\
+			""".format(user=args.get("user"))
+
+	return "{condition} {permissions}".format(condition=condition, permissions=perm)
+
+# def build_condition(filters):
+# 	if filters == "default_filter":
+# 		return ""
+# 	else:
+# 		field = filters.get("field") if filters.get("field") != "ticket_id" else "name"
+# 		val = filters.get("value")
+# 		op = filters.get("operation")
+# 		if op in ["NOT IN", "IN"]:
+# 			return "{0} {1} ({2})".format(field, op, ",".join(["'%s'"%(v) for v in val]))
+# 		else:
+# 			return "{0}{1}'{2}'".format(field, op, val)
 
 def send_new_ticket_notification(doc):
 	from utils import send_mail, build_table

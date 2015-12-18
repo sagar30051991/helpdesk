@@ -11,9 +11,11 @@ def validate_request():
 	
 	args  = get_json_request(frappe.local.form_dict.args)
 	cmd = frappe.local.form_dict.cmd
-	method = cmd.split(".")[2] if cmd != "login" else cmd
+	# method = cmd.split(".")[2] if cmd != "login" else cmd
+	method = cmd.split(".")[2] if cmd not in ["login", "logout"] else cmd
 
-	if method != "login": validate_user_against_session_id(args)
+	# if method != "login": validate_user_against_session_id(args)
+	if method not in ["login", "logout"]: validate_user_against_session_id(args)
 	validate_request_parameters(method, args)
 
 def validate_url():
@@ -26,8 +28,11 @@ def validate_url():
 	if len(parts) > 2:
 		cmd = parts[2]
 
-	if call == "login" and len(parts) == 2:
-		frappe.local.form_dict.cmd = "login"
+	# if call == "login" and len(parts) == 2:
+	# 	frappe.local.form_dict.cmd = "login"
+
+	if call in ["login", "logout"] and len(parts) == 2:
+		frappe.local.form_dict.cmd = call
 
 	elif call== "issue" and len(parts) == 3:
 		try:
@@ -94,6 +99,10 @@ def validate_fields_length_and_type(fields_dict, args):
 				)
 
 def validate_login_request(args):
+	# TODO
+	pass
+
+def validate_logout_request(args):
 	# TODO
 	pass
 
@@ -315,6 +324,7 @@ def validate_user_against_session_id(args):
 
 validate_request_methods = {
 	"login": validate_login_request,
+	"logout": validate_logout_request,
 	"reportIssue": validate_report_issue_request,
 	"updateIssue": validate_update_issue_request,
 	"deleteIssue": validate_delete_issue_request,
