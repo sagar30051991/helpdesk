@@ -284,7 +284,8 @@ def validate_filters_parameter(fields_dict, args):
 		raise Exception("Value field is missing in filter")
 	elif not (isinstance(_filter.get("value"), basestring) or isinstance(_filter.get("value"), list)):
 		raise Exception("Invalid type for value field")
-
+	if _filter.get("field") == "status" and _filter.get("value") not in ["Open", "Closed", "Replied", "Hold"]:
+		raise Exception("Invalid status value, value should be Open, Closed, Hold or Replied")
 	if _filter: is_valid_field_and_operation_combo(_filter_sch, _filter)
 
 def is_valid_field_and_operation_combo(fields_dict, _filter):
