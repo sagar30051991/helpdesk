@@ -19,8 +19,8 @@ def validate_due_date(doc):
 	datetime_str = datetime.strptime(datetime_str.split(".")[0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
 	now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
-	if time_diff_in_hours(datetime_str, now_str) < 0:
-		frappe.throw("Can not assign past date")
+	# if time_diff_in_hours(datetime_str, now_str) < 0:
+	# 	frappe.throw("Can not assign past date")
 
 	creation = datetime.strptime(doc.creation, "%Y-%m-%d %H:%M:%S.%f")
 
@@ -50,9 +50,9 @@ def validate_due_date(doc):
 	else:
 		time = result[0].get("time")
 		if creation.replace(microsecond=0) == now.replace(microsecond=0):
-			due_dttm = now + timedelta(hours=time)
-			doc.due_time = due_dttm.strftime("%H:%M:%S")
-			doc.date = due_dttm.strftime("%Y-%m-%d ")
+			set_due_dttm(doc, now, time)
+		elif time_diff_in_hours(datetime_str, now_str) < 0:
+			set_due_dttm(doc, now, time)
 		else:
 			datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
 			time_diff = time_diff_in_hours(datetime_str, str(now))
@@ -106,3 +106,8 @@ def get_highest_role(user):
 
 	if not highest_role:
 		frappe.throw("You can not assign Ticket to any other user")
+
+def set_due_dttm(doc, now, time):
+	due_dttm = now + timedelta(hours=time)
+	doc.due_time = due_dttm.strftime("%H:%M:%S")
+	doc.date = due_dttm.strftime("%Y-%m-%d ")

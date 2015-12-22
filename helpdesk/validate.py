@@ -290,7 +290,7 @@ def validate_filters_parameter(fields_dict, args):
 			for status in val:
 				if status not in ["Open", "Closed", "Replied", "Hold"]:
 					raise Exception("Invalid status value, value should be Open, Closed, Hold or Replied")
-		elif if val not in ["Open", "Closed", "Replied", "Hold"]:
+		elif val not in ["Open", "Closed", "Replied", "Hold"]:
 			raise Exception("Invalid status value, value should be Open, Closed, Hold or Replied")
 
 	if _filter: is_valid_field_and_operation_combo(_filter_sch, _filter)

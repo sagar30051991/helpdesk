@@ -79,6 +79,9 @@ doc_events = {
 	},
 	"User": {
 		"validate": "helpdesk.py.user.validate_user"
+	},
+	"DocShare": {
+		"validate": "helpdesk.py.docshare.validate_docshare",
 	}
 }
 
