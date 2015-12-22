@@ -39,6 +39,7 @@ def ticket_escallation():
     """
         Escalate Pending Support Tickets to higher authority
     """
+    print "ticket escalation"
     query = """ SELECT * FROM `tabTicket Escalation History` WHERE status NOT IN ('Closed','Deleted') ORDER BY name"""
     records = frappe.db.sql(query, as_dict=True)
 
@@ -59,11 +60,11 @@ def ticket_escallation():
         assigned_tickets = [record for record in records if record.get("is_assigned")]
         not_assigned_tickets = [record for record in records if not record.get("is_assigned")]
 
-        open_tickets = check_for_open_support_tickets(not_assigned_tickets, esc_setting)
+        # open_tickets = check_for_open_support_tickets(not_assigned_tickets, esc_setting)
 
-        if open_tickets:
-            args = get_open_tickets_details("Administrator", open_tickets)
-            send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
+        # if open_tickets:
+        #     args = get_open_tickets_details("Administrator", open_tickets)
+        #     send_mail(args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
 
         check_and_escalate_assigned_tickets(assigned_tickets, esc_setting)
 

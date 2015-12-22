@@ -92,12 +92,12 @@ scheduler_events = {
 	# "all": [
 	# 	"helpdesk.tasks.sync_db"
 	# ],
-	# "hourly": [
-	# 	"helpdesk.tasks.ticket_escallation"
-	# ],
-	"all": [
+	"hourly": [
 		"helpdesk.tasks.ticket_escallation"
 	],
+	# "all": [
+	# 	"helpdesk.tasks.ticket_escallation"
+	# ],
 	# "daily": [
 	# 	"helpdesk.tasks.daily"
 	# ],
