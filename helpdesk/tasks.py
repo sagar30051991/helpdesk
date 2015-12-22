@@ -131,10 +131,10 @@ def check_and_escalate_assigned_tickets(records, esc_setting):
             else:
                 escalate_ticket_to_higher_authority(esc_setting, record)
 
-    if rec_cant_be_escalate:
-        args = get_tickets_details_that_cant_be_escalate(rec_cant_be_escalate)
-        for dept_head, mail_args in args.iteritems():
-            send_mail(mail_args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
+    # if rec_cant_be_escalate:
+    #     args = get_tickets_details_that_cant_be_escalate(rec_cant_be_escalate)
+    #     for dept_head, mail_args in args.iteritems():
+    #         send_mail(mail_args, "[HelpDesk][Open Tickets] HelpDesk Notifications")
 
 
 def get_time_difference(esc_setting, role="Administrator"):
