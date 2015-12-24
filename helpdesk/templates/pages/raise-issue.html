@@ -1,0 +1,46 @@
+{% block title %}<center>Raise Issue</center>{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-4" align="right">Raised By</div>
+  <div class="col-xs-6">
+    <div class="form-group">
+      <input class="form-control" id="raised_by" type="text"/>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-4" align="right"> Subject</div>
+  <div class="col-xs-6">
+    <div class="form-group">
+      <select class="form-control" id="subject"></select>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-4" align="right"> Department</div>
+  <div class="col-xs-6">
+    <div class="form-group">
+		<select class="form-control" id="department"></select>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-4" align="right">Description</div>
+  <div class="col-xs-6">
+    <div class="form-group">
+      <textarea class="form-control" id="description" style="max-height='115px !important'"></textarea>
+    </div>
+  </div>
+</div>
+<div class="row" align="center">
+  <div class="col-xs-12" align="center">
+    <div class="form-group">
+      <button class="btn btn-primary btn-raise">Raise Support Ticket</button>
+    </div>
+  </div>
+</div>
+<script>
+	{% include "templates/includes/raise-issue.js" %}
+</script>
+{% endblock %}
