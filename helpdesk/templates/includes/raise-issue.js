@@ -60,7 +60,8 @@ raise_support_issue = function(){
 			else
 				frappe.msgprint("Error while Saving Support Ticket, Please try after some time")
 
-			$(".btn-raise").prop("disabled", true);
+			$(".btn-raise").prop("disabled", false);
+			clear_fields();
 		}
 	});
 }
