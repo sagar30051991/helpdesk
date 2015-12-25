@@ -48,6 +48,11 @@ def get_data():
 					"name": "Ticket Escalation Settings",
 					"description": _("Support Ticket Escalation Settings.")
 				},
+				{
+					"type": "doctype",
+					"name": "Subject",
+					"description": _("List Of Subjects")
+				}
 			]
 		},
 		{
