@@ -1,10 +1,16 @@
 $(document).ready(function() {
     get_subject_and_department_list()
+    
     $('.btn-raise').click(function() {
-        // $(".btn-raise").prop("disabled", true);
-        if(validate_inputs())
+        if(validate_inputs()){
+        	$(".btn-raise").prop("disabled", true);
         	raise_support_issue()
+        }
      });
+
+    $('.btn-clear').click(function() {
+    	clear_fields()
+    });
 });
 
 get_subject_and_department_list = function(){
@@ -17,12 +23,12 @@ get_subject_and_department_list = function(){
 				subjects = r.message.subjects;
 				departments = r.message.departments;
 
-				subj_opts = ""
+				subj_opts = "<option></option>"
 				$.each(subjects, function(idx, subj){
 					subj_opts += repl("<option>%(subject)s</option>", subj);
 				})
 
-				dept_opts = ""
+				dept_opts = "<option></option>"
 				$.each(departments, function(idx, dept){
 					dept_opts += repl("<option>%(department)s</option>", dept);
 				})
@@ -53,6 +59,8 @@ raise_support_issue = function(){
 				frappe.msgprint("Support Ticket "+ r.message +" is created sucessfully")
 			else
 				frappe.msgprint("Error while Saving Support Ticket, Please try after some time")
+
+			$(".btn-raise").prop("disabled", true);
 		}
 	});
 }
@@ -87,4 +95,11 @@ validate_inputs = function(){
 		return false
 	}
 
+}
+
+clear_fields = function(){
+	$("#raised_by").val("")
+	$("#subject").val("")
+	$("#department").val("")
+	$("#description").val("")
 }
