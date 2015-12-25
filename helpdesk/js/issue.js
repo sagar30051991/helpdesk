@@ -4,7 +4,7 @@ frappe.ui.form.on("Issue", {
 			cur_frm.toggle_reqd("department", true)
 		}
 		else{
-			this.frm.toggle_enable("department", false)
+			cur_frm.toggle_enable("department", false)
 		}
 	},
 });
