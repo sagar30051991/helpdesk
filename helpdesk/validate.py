@@ -111,6 +111,7 @@ def validate_report_issue_request(args):
 		issue = is_issue_already_exists(args)
 		if not issue:
 			is_valid_user(args.get("user"))
+			is_valid_subject(args.get("subject"))
 			is_valid_department(args.get("department"))
 			if not check_user_permission(args, ptype="create"):
 				raise Exception("User don't have permissions to create the ticket".format(args.get("ticket_id")))
@@ -154,6 +155,7 @@ def validate_update_issue_request(args):
 				# only admin should be able to change the department
 				dept = args.get("department")
 				is_valid_department(dept)
+				is_valid_subject(args.get("subject"))
 				if dept and dept != frappe.db.get_value("Issue", args.get("ticket_id"), "department"):
 					if args.get("user") != "Administrator":
 						# raise Exception("Only Administrator is allowed to update the department")
@@ -329,6 +331,16 @@ def validate_user_against_session_id(args):
 		raise Exception("user field is missing")
 	elif user != frappe.db.get_value("Sessions", {"sid":sid}, "user"):
 		raise Exception("Invalid User")
+
+def is_valid_subject(subject):
+	if subject == frappe.db.get_value("Subject", subject, "name"):
+		return True
+	else:
+		msg = "{msg} [{desc}]".format(
+					msg="Invalid Support Ticket Subject, Subject should be one of the following",
+					desc=" or ".join(["'%s'"%subj.get("name") for subj in frappe.db.get_all("Subject", order_by="name")])
+				)
+		raise Exception(msg)
 
 validate_request_methods = {
 	"login": validate_login_request,
