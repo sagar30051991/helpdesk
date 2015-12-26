@@ -109,7 +109,7 @@ scheduler_events = {
 	# ]
 }
 
-fixtures = ["Property Setter", "Custom Field"]
+fixtures = ["Property Setter", "Custom Field", "Website Settings"]
 
 # Testing
 # -------
