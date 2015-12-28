@@ -24,6 +24,7 @@ STANDARD_USERS = ["Guest", "Administrator"]
 
 def user_query(doctype, txt, searchfield, start, page_len, filters):
 	from helpdesk.py.todo import get_highest_role, get_role_priority
+	from frappe.desk.reportview import get_match_cond
 
 	highest_role = get_highest_role(frappe.session.user)
 	query = ""
@@ -40,6 +41,8 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 		priority = get_role_priority(highest_role).get("priority")
 		roles = frappe.db.sql("select role from `tabRole Priority` where priority < %s"%(priority), as_list=True)
 		roles = [role[0] for role in roles]
+
+	txt = "%{}%".format(txt)
 
 	query = """	SELECT DISTINCT
 				    usr.name,
@@ -58,11 +61,17 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 				AND ifnull(enabled, 0)=1
 				AND usr.docstatus < 2
 				AND usr.name NOT IN ({standard_users})
-				AND usr.user_type != 'Website User' {dept}""".format(
+				AND (usr.{key} like %s
+				AND usr.user_type != 'Website User'
+				OR concat_ws(' ', first_name, middle_name, last_name) like %s)
+				{dept} limit %s, %s""".format(
 					roles=",".join(["'%s'"%(role) for role in roles]),
 					standard_users=", ".join(["'%s'"%(role) for role in STANDARD_USERS]),
-					dept=dept)
-	return frappe.db.sql(query)
+					dept=dept,
+					key=searchfield,
+					mcond=get_match_cond(doctype))
+
+	return frappe.db.sql(query, tuple([txt, txt, start, page_len]), debug=1)
 
 def validate_multiple_issue_name(names):
 	query = """SELECT DISTINCT department FROM `tabIssue` WHERE name IN ({names})""".format(
