@@ -39,10 +39,12 @@ def get_subject_and_department_list():
 
 @frappe.whitelist(allow_guest=True)
 def raise_issue(raised_by, department, description, subject):
+	import HTMLParser
+	
 	issue = frappe.new_doc("Issue")
 	issue.raised_by = raised_by
-	issue.department = department
-	issue.description = description
-	issue.subject = subject
+	issue.department = HTMLParser.HTMLParser().unescape(department)
+	issue.description = HTMLParser.HTMLParser().unescape(description)
+	issue.subject = HTMLParser.HTMLParser().unescape(subject)
 	issue.save(ignore_permissions=True)
 	return issue.name

@@ -30,7 +30,7 @@ get_subject_and_department_list = function(){
 
 				dept_opts = "<option></option>"
 				$.each(departments, function(idx, dept){
-					dept_opts += repl("<option>%(department)s</option>", dept);
+					dept_opts += repl("<option value=\"%(department)s\">%(department)s</option>", dept);
 				})
 
 				$(subj_opts).appendTo($("#subject"));
@@ -50,8 +50,8 @@ raise_support_issue = function(){
 		freeze_message: "Creating New Support Ticket",
 		args: {
 			raised_by: $("#raised_by").val().trim(),
-			subject: $("#subject").val().trim(),
-			department: $("#department").val().trim(),
+			subject: $("#subject").val(),
+			department: $("#department").val(),
 			description: $("#description").val().trim()
 		},
 		callback: function(r){
@@ -68,10 +68,10 @@ raise_support_issue = function(){
 
 validate_inputs = function(){
 	missing_fields = []
-	raised_by = $("#raised_by").val().trim()
-	subject = $("#subject").val().trim()
-	department = $("#department").val().trim()
-	description = $("#description").val().trim()
+	raised_by = $("#raised_by").val().trim();
+	subject = $("#subject").val();
+	department = $("#department").val();
+	description = $("#description").val().trim();
 
 	if(!$("#raised_by").val().trim())
 		missing_fields.push("Raised By")
