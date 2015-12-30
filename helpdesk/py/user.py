@@ -95,6 +95,7 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 		[roles_in.append(result.get("role")) if result.get("priority") < priority else roles_not_in.append(result.get("role")) for result in roles]
 
 	txt = "%{}%".format(txt)
+	if not roles_in: roles_in.append("")
 
 	query = """	SELECT DISTINCT
 				    usr.name,
@@ -118,7 +119,7 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 				                     FROM
 				                         tabUserRole
 				                     WHERE
-				                         role IN {roles_not_in})
+				                         role IN ({roles_not_in}))
 				AND ifnull(enabled, 0)=1
 				AND usr.docstatus < 2
 				AND (
@@ -128,7 +129,7 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 				    ) 
 				{dept} ORDER BY usr.department ASC limit %s, %s""".format(
 					roles_in=",".join(["'%s'"%(role) for role in roles_in]),
-					roles_not_in="(%s)"%(",".join(["'%s'"%(role) for role in roles_not_in])),
+					roles_not_in=",".join(["'%s'"%(role) for role in roles_not_in]),
 					standard_users=", ".join(["'%s'"%(role) for role in STANDARD_USERS]),
 					dept=dept,
 					key=searchfield,
