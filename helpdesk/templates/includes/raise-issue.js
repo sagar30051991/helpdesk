@@ -1,18 +1,3 @@
-$(document).ready(function() {
-    get_subject_and_department_list()
-    
-    $('.btn-raise').click(function() {
-        if(validate_inputs()){
-        	$(".btn-raise").prop("disabled", true);
-        	raise_support_issue()
-        }
-     });
-
-    $('.btn-clear').click(function() {
-    	clear_fields()
-    });
-});
-
 get_subject_and_department_list = function(){
 	return frappe.call({
 		method: "helpdesk.py.issue.get_subject_and_department_list",
@@ -104,3 +89,18 @@ clear_fields = function(){
 	$("#department").val("")
 	$("#description").val("")
 }
+
+$(document).ready(function() {
+    get_subject_and_department_list()
+    
+    $('.btn-raise').click(function() {
+        if(validate_inputs()){
+        	$(".btn-raise").prop("disabled", true);
+        	raise_support_issue()
+        }
+     });
+
+    $('.btn-clear').click(function() {
+    	clear_fields()
+    });
+});
