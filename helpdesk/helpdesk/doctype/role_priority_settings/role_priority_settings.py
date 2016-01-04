@@ -11,8 +11,11 @@ class RolePrioritySettings(Document):
 		if not self.roles_priority:
 			frappe.throw("Please Set the roles priority first")
 		
-		ttl_record = len(self.roles_priority) + 1
-		p = [n for n in xrange(1, ttl_record)][::-1]
+		roles = ["Administrator", "Department Head"]
+		[roles.append(ch.role) for ch in self.roles_priority if ch.role not in roles]
 
-		for ch in self.roles_priority:
-			ch.priority = p[ch.idx - 1]
+		self.set('roles_priority', [])
+		for i, role in enumerate(roles):
+			rl = self.append('roles_priority', {})
+			rl.role = role
+			rl.priority = len(roles) - i

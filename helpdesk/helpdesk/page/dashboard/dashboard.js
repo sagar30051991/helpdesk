@@ -1,5 +1,16 @@
 frappe.provide("helpdesk");
 
+var user_department = ""
+$(document).ready(function(){
+	return frappe.call({
+		method: "helpdesk.helpdesk.page.dashboard.dashboard.get_user_department",
+		args: {"user":user},
+		callback:function(r){
+			user_department = r.message?r.message:""
+		}
+	});
+})
+
 frappe.pages['dashboard'].on_page_load = function(wrapper) {
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
@@ -8,7 +19,7 @@ frappe.pages['dashboard'].on_page_load = function(wrapper) {
 	});
 
 	setTimeout(function(){
-		new helpdesk.DashboardGridView(wrapper, page);	
+		new helpdesk.DashboardGridView(wrapper, page);
 	}, 1)
 	frappe.breadcrumbs.add("HelpDesk")
 }
@@ -89,7 +100,7 @@ helpdesk.DashboardGridView = Class.extend({
 		this.status = this.page.add_field({fieldtype:"Select", fieldname: "status", 
 			label: __("Ticket Status"), options:["All", "Open", "Pending", "Closed"], default:"All"});
 		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
-			fieldname:"department", options:"Department"});
+			fieldname:"department", options:"Department", default:user_department});
 	},
 	bind_filters:function(){
 		var me = this
@@ -300,5 +311,5 @@ helpdesk.DashboardGridView = Class.extend({
 				this.refresh();
 			}
 		}
-	}
+	},
 });

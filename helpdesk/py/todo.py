@@ -4,15 +4,17 @@ from datetime import datetime, timedelta
 from frappe.utils import get_datetime, time_diff_in_hours
 
 def validate_todo(doc, method):
-	if doc.reference_type == "Issue":
+	if doc.reference_type == "Issue" and doc.status != "Closed":
+		validate_issue_status(doc.reference_name, doc.status)
 		validate_due_date(doc)
 		validate_assigned_by(doc)
 
+def validate_issue_status(issue, todo_status):
+	if frappe.db.get_value("Issue", issue, "status") == "Closed":
+		frappe.throw("Can not assign Closed ticket to another user")
+
 def validate_due_date(doc):
 	# get the time limit for the role from escalation settings
-	if doc.status == "Closed":
-		return
-
 	now = get_datetime().now()
 	datetime_str = "{date} {time}".format(date=doc.date, time=doc.due_time)
 
