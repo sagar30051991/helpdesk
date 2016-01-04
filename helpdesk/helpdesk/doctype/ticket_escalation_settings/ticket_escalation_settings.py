@@ -18,13 +18,16 @@ class TicketEscalationSettings(Document):
 
 	def setup_default_profile(self):
 		if self.is_default:
-			query = """UPDATE `tabTicket Escalation Settings` SET is_default=0, modified='%s'"""%(now())
+			query = """	UPDATE `tabTicket Escalation Settings` SET is_default=0, modified='{now}' WHERE
+						name<>'{name}'""".format(now=now(), name=self.name)
 			frappe.db.sql(query)
 		else:
 			docname = frappe.db.get_value("Ticket Escalation Settings", {"is_default":1, "name":["!=", self.name]}, "name")
 			if not docname:
-				frappe.db.set_value("Ticket Escalation Settings", "Default", "is_default", 1)
-				# frappe.throw("System should have atleast one default settings profile")
+				if self.name == "Default":
+					self.is_default = 1
+				else:
+					frappe.db.set_value("Ticket Escalation Settings", "Default", "is_default", 1)
 				frappe.msgprint("Setting up the Default Escalation Settings")
 
 	def validate_escalation_heirarchy_records(self):

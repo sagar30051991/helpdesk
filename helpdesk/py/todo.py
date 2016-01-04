@@ -8,6 +8,9 @@ def validate_todo(doc, method):
 		validate_issue_status(doc.reference_name, doc.status)
 		validate_due_date(doc)
 		validate_assigned_by(doc)
+	elif doc.reference_type == "Issue" and doc.status == "Closed":
+		# delete the share doc from user
+		pass
 
 def validate_issue_status(issue, todo_status):
 	if frappe.db.get_value("Issue", issue, "status") == "Closed":
