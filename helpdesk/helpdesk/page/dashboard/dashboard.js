@@ -1,10 +1,12 @@
 frappe.provide("helpdesk");
 
-var user_department = ""
+var user_department = "";
+
 $(document).ready(function(){
-	frappe.call({
+	return frappe.call({
 		method: "helpdesk.helpdesk.page.dashboard.dashboard.get_user_department",
-		args: {"user":user},
+		args: {"user":user },
+		async:false,
 		callback:function(r){
 			user_department = r.message?r.message:""
 		}
@@ -20,7 +22,7 @@ frappe.pages['dashboard'].on_page_load = function(wrapper) {
 
 	setTimeout(function(){
 		new helpdesk.DashboardGridView(wrapper, page);
-	}, 1)
+	}, 5)
 	frappe.breadcrumbs.add("HelpDesk")
 }
 
