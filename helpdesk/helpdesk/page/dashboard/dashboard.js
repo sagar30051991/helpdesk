@@ -2,7 +2,7 @@ frappe.provide("helpdesk");
 
 var user_department = ""
 $(document).ready(function(){
-	return frappe.call({
+	frappe.call({
 		method: "helpdesk.helpdesk.page.dashboard.dashboard.get_user_department",
 		args: {"user":user},
 		callback:function(r){

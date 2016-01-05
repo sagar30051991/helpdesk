@@ -19,6 +19,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Subject",
+					"description": _("List Of Subjects")
+				},
+				{
+					"type": "doctype",
 					"name": "Priority",
 					"description": _("Support Ticket Priority."),
 				},
@@ -47,11 +52,6 @@ def get_data():
 					"type": "doctype",
 					"name": "Ticket Escalation Settings",
 					"description": _("Support Ticket Escalation Settings.")
-				},
-				{
-					"type": "doctype",
-					"name": "Subject",
-					"description": _("List Of Subjects")
 				}
 			]
 		},
