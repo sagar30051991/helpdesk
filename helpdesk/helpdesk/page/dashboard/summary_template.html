@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-xs-12" align="center">
+        <h4>Helpdesk Support Ticket Summary</h4>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-xs-7" align="right">
+        <b>Total Number Of Tickets</b></div>
+      <div class="col-xs-5">
+        <span class="open-notification">{{ total_tickets }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-7" align="right"><b>Open Tickets</b>
+      </div>
+      <div class="col-xs-5">
+        <span class="open-notification">{{ open_tickets }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-7" align="right"><b>Pending Tickets</b></div>
+      <div class="col-xs-5">
+        <span class="open-notification">{{ pending_tickets }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-7" align="right"><b>Closed Tickets</b></div>
+      <div class="col-xs-5">
+        <span class="open-notification">{{ closed_tickets }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-xs-12" align="center">
+        <h4>Links</h4>
+      </div>
+    </div>
+    <div class="row" id="links" align="center">
+      {% for(var i=0, l=links.length; i < l; i++) { %}
+      <div style="display:inline-block;margin-left: 10px;margin-right: 10px;">
+        <a href="{{ links[i].link }}">
+          <div class="app-icon" style="background-color: {{ links[i].bgcolor }}" title="{{ links[i].title }}" align="center">
+            <i class="{{ links[i].icon }}" title="{{ links[i].title }}"></i>
+          </div>
+        </a>
+        <div class="case-label text-ellipsis">
+          <span class="case-label-text" style="color: black;text-shadow: none;">{{ links[i].title }}</span>
+        </div>
+      </div>
+      {% } %}
+    </div>
+  </div>
+</div>

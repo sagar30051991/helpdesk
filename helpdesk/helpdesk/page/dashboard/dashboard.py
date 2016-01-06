@@ -2,6 +2,27 @@ import frappe
 import json
 from frappe.utils import date_diff, add_days, get_datetime, getdate
 
+links_info = [
+				{
+					"title": "ToDo",
+					"icon": "octicon octicon-list-unordered",
+					"bgcolor": "#4aa3df",
+					"link":"#List/ToDo"
+				},
+				{
+					"title": "Support Ticket",
+					"icon": "octicon octicon-issue-opened",
+					"bgcolor": "#4aa3df",
+					"link": "#List/Issue"
+				},
+				{
+					"title": "Desk",
+					"icon": "octicon octicon-briefcase",
+					"bgcolor": "#4aa3df",
+					"link": "#Module/HelpDesk"
+				}
+			]
+
 @frappe.whitelist()
 def get_support_ticket_data(args):
 	"""
@@ -43,10 +64,15 @@ def get_support_ticket_data(args):
 			"open_tickets": 0,
 			"closed_tickets": 0,
 			"pending_tickets": 0,
-			"plot_data": None
+			"plot_data": None,
+			"links":links_info
 		}
+
 	day_wise_record = get_day_wise_records(resultSet)
-	return get_data_in_flot_format(args.get("start"), args.get("end"), args.get("status"), day_wise_record)
+	resultSet = get_data_in_flot_format(args.get("start"), args.get("end"), args.get("status"), day_wise_record)
+	resultSet.update({"links":links_info})
+
+	return resultSet
 	
 def build_query(filters):
 	def build_conditions(filters):

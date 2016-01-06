@@ -71,7 +71,8 @@ helpdesk.DashboardGridView = Class.extend({
 				}
 
 				delete r.message["plot_data"]
-				me.render_summery_info(r.message);
+				// render summary information
+				$("#summary").html(frappe.render_template("summary_template", r.message));
 			}
 		});
 	},
@@ -121,54 +122,6 @@ helpdesk.DashboardGridView = Class.extend({
 		this.plot = $.plot(this.plot_area.toggle(true), plot_data, this.get_plot_options());
 
 		this.setup_plot_hover();
-	},
-	render_summery_info: function(info){
-		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-xs-12" align="center"><h3>\
-		Helpdesk Support Ticket Summary</h3></div></div><br><div class="row"><div class="col-xs-7" align="right">\
-		<b>Total Number Of Tickets</b></div><div class="col-xs-5"><span class="open-notification">'+
-		info.total_tickets +'</span></div></div><div class="row"><div class="col-xs-7" align="right"><b>Open Tickets</b>\
-		</div><div class="col-xs-5"><span class="open-notification">'+info.open_tickets +'</span></div></div>\
-		<div class="row"><div class="col-xs-7" align="right"><b>Pending Tickets</b></div><div class="col-xs-5">\
-		<span class="open-notification">'+ info.pending_tickets +'</span></div></div><div class="row">\
-		<div class="col-xs-7" align="right"><b>Closed Tickets</b></div><div class="col-xs-5"><span class="open-notification">'+ 
-		info.closed_tickets +'</span></div></div></div><div class="col-md-6"><div class="row"><div class="col-xs-12" \
-		align="center"><h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div><br>'
-
-
-		links_info = [
-			{
-				"title": "ToDo",
-				"icon": "octicon octicon-list-unordered",
-				"bgcolor": "#4aa3df",
-				"link":"#List/ToDo"
-			},
-			{
-				"title": "Support Ticket",
-				"icon": "octicon octicon-issue-opened",
-				"bgcolor": "#4aa3df",
-				"link": "#List/Issue"
-			},
-			{
-				"title": "Desk",
-				"icon": "octicon octicon-briefcase",
-				"bgcolor": "#4aa3df",
-				"link": "#Module/HelpDesk"
-			}
-		]
-
-		$("#summary").html(html)
-		this.render_links_icon(links_info)
-	},
-	render_links_icon:function(links_info){
-		$.each(links_info, function(i, m) {
-			html = '<div style="display:inline-block;margin-left: 10px;margin-right: 10px;">\
-			<a href="%(link)s"><div class="app-icon" style="background-color: %(bgcolor)s" \
-			title="%(title)s" align="center"><i class="%(icon)s" title="%(title)s"></i></div>\
-			</a><div class="case-label text-ellipsis"><span class="case-label-text" style="color:\
-			 black;text-shadow: none;">%(title)s</span></div></div>'
-
-			$(repl(html, m)).appendTo($("#links"));
-		});
 	},
 	setup_plot_check: function() {
 		var me = this;
@@ -226,12 +179,23 @@ helpdesk.DashboardGridView = Class.extend({
 
 	},
 	get_tooltip_text: function(label, x, y, names) {
-	 	html =  '<table border=1 style="border-collapse: collapse;"><tr>\
-	 	<td colspan="2" align="center"><b>%(label)s Tickets</b></td></tr>\
-	 	<tr><td><b>Date</b></td><td style="padding: 5px;">%(date)s</td>\
-	 	</tr><tr><td><b>No. Of Tickets</b></td><td style="padding: 5px;" \
-	 	align="right">%(value)s</td></tr><tr><td><b>Ticket ID"s</b></td>\
-	 	<td style="padding: 5px;">%(name)s</td></tr></table>'
+	 	html =  '<table border=1 style="border-collapse: collapse;">\
+				  <tr>\
+				    <td colspan="2" align="center"><b>%(label)s Tickets</b></td>\
+				  </tr>\
+				  <tr>\
+				    <td><b>Date</b></td>\
+				    <td style="padding: 5px;">%(date)s</td>\
+				  </tr>\
+				  <tr>\
+				    <td><b>No. Of Tickets</b></td>\
+				    <td style="padding: 5px;" align="right">%(value)s</td>\
+				  </tr>\
+				  <tr>\
+				    <td><b>Ticket ID"s</b></td>\
+				    <td style="padding: 5px;">%(name)s</td>\
+				  </tr>\
+				</table>'
 
 	 	return repl(html, {
 	 		label:label,
