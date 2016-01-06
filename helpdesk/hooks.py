@@ -42,7 +42,7 @@ app_version = "0.0.1"
 # ------------
 
 # before_install = "helpdesk.install.before_install"
-# after_install = "helpdesk.install.after_install"
+after_install = "helpdesk.install.after_install"
 
 # Desk Notifications
 # ------------------
@@ -90,7 +90,7 @@ doc_events = {
 
 scheduler_events = {
 	# "all": [
-	# 	"helpdesk.tasks.sync_db"
+	# 	"helpdesk.tasks.ticket_escallation"
 	# ],
 	"hourly": [
 		"helpdesk.tasks.ticket_escallation"
@@ -122,3 +122,5 @@ fixtures = ["Property Setter", "Custom Field", "Website Settings"]
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "helpdesk.event.get_events"
 # }
+
+boot_session = "helpdesk.py.boot.boot_session"

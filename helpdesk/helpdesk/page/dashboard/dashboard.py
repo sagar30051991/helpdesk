@@ -239,10 +239,3 @@ def get_names_as_html_string(names):
 		names = names[:2]
 		names.append("and {0} more".format(total))
 	return "<br>".join([r for r in names])
-
-# def get_allowed_issue_names_query(user):
-# 	query = """SELECT name FROM tabIssue"""
-
-@frappe.whitelist()
-def get_user_department(user):
-	return frappe.db.get_value("User",user, "department")

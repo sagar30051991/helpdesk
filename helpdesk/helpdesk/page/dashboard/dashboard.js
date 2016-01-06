@@ -1,18 +1,5 @@
 frappe.provide("helpdesk");
 
-var user_department = "";
-
-$(document).ready(function(){
-	return frappe.call({
-		method: "helpdesk.helpdesk.page.dashboard.dashboard.get_user_department",
-		args: {"user":user },
-		async:false,
-		callback:function(r){
-			user_department = r.message?r.message:""
-		}
-	});
-})
-
 frappe.pages['dashboard'].on_page_load = function(wrapper) {
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
@@ -102,7 +89,7 @@ helpdesk.DashboardGridView = Class.extend({
 		this.status = this.page.add_field({fieldtype:"Select", fieldname: "status", 
 			label: __("Ticket Status"), options:["All", "Open", "Pending", "Closed"], default:"All"});
 		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
-			fieldname:"department", options:"Department", default:user_department});
+			fieldname:"department", options:"Department", default:frappe.boot.department});
 	},
 	bind_filters:function(){
 		var me = this
@@ -136,15 +123,15 @@ helpdesk.DashboardGridView = Class.extend({
 		this.setup_plot_hover();
 	},
 	render_summery_info: function(info){
-		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-md-12" align="center"><h3>\
-		Helpdesk Support Ticket Summary</h3></div></div><br><div class="row"><div class="col-md-7" align="right">\
-		<b>Total Number Of Tickets</b></div><div class="col-md-5"><span class="open-notification">'+
-		info.total_tickets +'</span></div></div><div class="row"><div class="col-md-7" align="right"><b>Open Tickets</b>\
-		</div><div class="col-md-5"><span class="open-notification">'+info.open_tickets +'</span></div></div>\
-		<div class="row"><div class="col-md-7" align="right"><b>Pending Tickets</b></div><div class="col-md-5">\
+		html = '<div class="row"><div class="col-md-6"><div class="row"><div class="col-xs-12" align="center"><h3>\
+		Helpdesk Support Ticket Summary</h3></div></div><br><div class="row"><div class="col-xs-7" align="right">\
+		<b>Total Number Of Tickets</b></div><div class="col-xs-5"><span class="open-notification">'+
+		info.total_tickets +'</span></div></div><div class="row"><div class="col-xs-7" align="right"><b>Open Tickets</b>\
+		</div><div class="col-xs-5"><span class="open-notification">'+info.open_tickets +'</span></div></div>\
+		<div class="row"><div class="col-xs-7" align="right"><b>Pending Tickets</b></div><div class="col-xs-5">\
 		<span class="open-notification">'+ info.pending_tickets +'</span></div></div><div class="row">\
-		<div class="col-md-7" align="right"><b>Closed Tickets</b></div><div class="col-md-5"><span class="open-notification">'+ 
-		info.closed_tickets +'</span></div></div></div><div class="col-md-6"><div class="row"><div class="col-md-12" \
+		<div class="col-xs-7" align="right"><b>Closed Tickets</b></div><div class="col-xs-5"><span class="open-notification">'+ 
+		info.closed_tickets +'</span></div></div></div><div class="col-md-6"><div class="row"><div class="col-xs-12" \
 		align="center"><h3>Links</h3></div></div><div class="row" id="links" align="center"></div></div></div><br>'
 
 
