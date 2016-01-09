@@ -39,8 +39,18 @@ def ticket_escallation():
     """
         Escalate Pending Support Tickets to higher authority
     """
-    print "ticket escalation"
     query = """ SELECT * FROM `tabTicket Escalation History` WHERE status NOT IN ('Closed','Deleted') ORDER BY name"""
+    # TODO send mails for open tickets, ticket not assigned and use next_contact_on datetime
+    # query = """ SELECT
+    #                 * 
+    #             FROM 
+    #                 `tabTicket Escalation History` 
+    #             WHERE 
+    #                 status NOT IN ('Closed','Deleted') 
+    #             AND
+    #                 next_check_on < '{now}'
+    #             ORDER BY name""".format(now=get_datetime().now())
+
     records = frappe.db.sql(query, as_dict=True)
 
     if not records:
