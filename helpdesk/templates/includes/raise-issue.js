@@ -37,7 +37,12 @@ raise_support_issue = function(){
 			raised_by: $("#raised_by").val().trim(),
 			subject: $("#subject").val(),
 			department: $("#department").val(),
-			description: $("#description").val().trim()
+			description: $("#description").val().trim(),
+			category: $("#category").val().trim(),
+			floor: $("#floor").val().trim(),
+			wing: $("#wing").val().trim(),
+			extension_number: $("#extension_number").val().trim(),
+			cabin_or_workstation_number: $("#cabin_or_workstation_number").val().trim()
 		},
 		callback: function(r){
 			if(r.message)
@@ -53,19 +58,16 @@ raise_support_issue = function(){
 
 validate_inputs = function(){
 	missing_fields = []
-	raised_by = $("#raised_by").val().trim();
-	subject = $("#subject").val();
-	department = $("#department").val();
-	description = $("#description").val().trim();
-
-	if(!$("#raised_by").val().trim())
-		missing_fields.push("Raised By")
-	if(!$("#subject").val().trim())
-		missing_fields.push("Subject")
-	if(!$("#department").val().trim())
-		missing_fields.push("Department")
-	if(!$("#description").val().trim())
-		missing_fields.push("Description")
+	fields_id = [	{id:"#raised_by", label:"Raised By"}, {id:"#subject", label:"Subject"}, 
+					{id:"#department", label:"Department"}, {id:"#department", label:"Department"},
+					{id:"#extension_number", label:"Extension Number"}, {id:"#floor", label:"Floor"},
+					{id:"#wing", label:"Wing"}, {id:"#cabin_or_workstation_number", label:"Cabin Or Workstation Number"},
+					{id:"#category", label:"Category"},{id:"#description", label:"Description"}
+				]
+	$.each(fields_id, function(i, field){
+		if(!$(field.id).val().trim())
+			missing_fields.push(field.label)
+	})
 
 	if(!missing_fields.length){
 		if(!valid_email($("#raised_by").val().trim())){
@@ -84,10 +86,14 @@ validate_inputs = function(){
 }
 
 clear_fields = function(){
-	$("#raised_by").val("")
-	$("#subject").val("")
-	$("#department").val("")
-	$("#description").val("")
+	fields_id = [	"#raised_by", "#subject", "#department", 
+					"#description", "#extension_number", "#floor",
+					"#wing", "#cabin_or_workstation_number", "#category",
+					"#department"
+				]
+	$.each(fields_id, function(i, id){
+		$(id).val("")
+	})
 }
 
 $(document).ready(function() {

@@ -21,13 +21,22 @@ def get_subject_and_department_list():
 	}
 
 @frappe.whitelist(allow_guest=True)
-def raise_issue(raised_by, department, description, subject):
+# def raise_issue(raised_by, department, description, subject):
+def raise_issue(**args):
+	import json
 	import HTMLParser
+
+	args = frappe._dict(args)
 	
 	issue = frappe.new_doc("Issue")
-	issue.raised_by = raised_by
-	issue.department = HTMLParser.HTMLParser().unescape(department)
-	issue.description = HTMLParser.HTMLParser().unescape(description)
-	issue.subject = HTMLParser.HTMLParser().unescape(subject)
+	issue.raised_by = args.raised_by
+	issue.department = HTMLParser.HTMLParser().unescape(args.department)
+	issue.description = HTMLParser.HTMLParser().unescape(args.description)
+	issue.subject = HTMLParser.HTMLParser().unescape(args.subject)
+	issue.category = HTMLParser.HTMLParser().unescape(args.subject)
+	issue.floor = HTMLParser.HTMLParser().unescape(args.subject)
+	issue.wing = HTMLParser.HTMLParser().unescape(args.subject)
+	issue.extension_number = HTMLParser.HTMLParser().unescape(args.subject)
+	issue.cabin_or_workstation_number = HTMLParser.HTMLParser().unescape(args.subject)
 	issue.save(ignore_permissions=True)
 	return issue.name
