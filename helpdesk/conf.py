@@ -64,6 +64,31 @@ api_request_schema = {
 				"length": 30,
 				"type": basestring
 			},
+			"category": {
+				"is_mandatory": 1,
+				"length": 30,
+				"type": basestring
+			},
+			"floor": {
+				"is_mandatory": 1,
+				"length": 30,
+				"type": basestring
+			},
+			"wing": {
+				"is_mandatory": 1,
+				"length": 30,
+				"type": basestring
+			},
+			"extension_number": {
+				"is_mandatory": 1,
+				"length": 30,
+				"type": basestring
+			},
+			"cabin_or_workstation_number": {
+				"is_mandatory": 1,
+				"length": 30,
+				"type": basestring
+			},
 			"sid": {
 				"is_mandatory": 1,
 				"length": 60,
@@ -153,6 +178,26 @@ api_request_schema = {
 				"type": basestring
 			},
 			"department": {
+				"length": 30,
+				"type": basestring
+			},
+			"category": {
+				"length": 30,
+				"type": basestring
+			},
+			"floor": {
+				"length": 30,
+				"type": basestring
+			},
+			"wing": {
+				"length": 30,
+				"type": basestring
+			},
+			"extension_number": {
+				"length": 30,
+				"type": basestring
+			},
+			"cabin_or_workstation_number": {
 				"length": 30,
 				"type": basestring
 			},
