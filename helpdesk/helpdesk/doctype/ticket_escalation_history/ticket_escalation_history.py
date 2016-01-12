@@ -3,9 +3,10 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import frappe
+from helpdesk.utils import send_mail
 from frappe.model.document import Document
 from frappe.utils import nowtime, get_datetime
-import frappe
 
 class TicketEscalationHistory(Document):
 	pass
@@ -27,6 +28,13 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 
 	esc = None
 	is_new = True
+	args = {
+		"user": "User",
+		"email": issue_doc.raised_by,
+		"action": "user_issue_notification",
+		"issue": issue_doc
+	}
+
 	if not esc_name:
 		# ticket does not exist create new
 		esc = frappe.new_doc("Ticket Escalation History")
@@ -44,6 +52,27 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 		esc.assigned_on = get_datetime(datetime_str)
 		esc.current_owner = "Administrator"
 		esc.current_role = "Administrator"
+		
+		args.update({
+			"msg": "A Support Ticket {name} has been created successfully in \
+			the HelpDesk System, please check the Support Ticket details".format(name=issue_doc.name)
+		})
+		send_mail(args, "[HelpDesk][Issue Raised] HelpDesk Notifications")
+		print args.get("email")
+		
+		esc.raised_email_notification = 1
+		esc.raised_email_notification_datetime = get_datetime().now()
+
+	# mail notification to email if issue status is closed
+	elif issue_doc.status == "Closed" and not esc.status_closed_email_notification:
+		args.update({
+			"msg": "A Support Ticket {name}'s status has been changed to Closed, \
+			please check the Support Ticket details".format(name=issue_doc.name)
+		})
+		send_mail(args, "[HelpDesk][Ticket Closed] HelpDesk Notifications")
+		
+		esc.status_closed_email_notification = 1
+		esc.status_closed_email_notification_datetime = get_datetime().now()
 
 	esc.save(ignore_permissions=True)
 
@@ -77,6 +106,24 @@ def create_update_escalation_record(todo=None, todo_name=None, esc_name=None):
 		# child entry not found create new entry
 		entry = esc.append('items', {})
 		entry.todo = todo.name
+
+		# Ticket assignment Email Notification to User
+		issue = frappe.get_doc("Issue", esc.ticket_id)
+		if not esc.assigned_email_notification:
+			args = {
+				"user": "User",
+				"msg": "Your Support Ticket ({name}) has been assigned to our support representative\
+				Please check the support ticket details".format(name=issue.name),
+				"email": issue.raised_by,
+				"action": "user_issue_notification",
+				"issue": issue
+			}
+
+			send_mail(args, "[HelpDesk][Ticket Assigned] HelpDesk Notifications")
+		
+			esc.assigned_email_notification = 1
+			esc.assigned_email_notification_datetime = get_datetime().now()
+
 	else:
 		# update child table record and update moodified date of the Ticket Escalation History
 		items = esc.items
