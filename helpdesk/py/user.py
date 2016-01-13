@@ -87,7 +87,7 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 			dept = validate_multiple_issue_name(filters.get("issue"))
 		else:
 			dept = frappe.db.get_value("Issue",filters.get("issue"),"department")
-		dept = "AND usr.department='{dept}'".format(dept=dept)
+		dept = "AND usr.department='{dept}'".format(dept=dept) if dept else ""
 	else:
 		priority = get_role_priority(highest_role).get("priority")
 		query = "select role, priority from `tabRole Priority`"
@@ -134,7 +134,6 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 					dept=dept,
 					key=searchfield,
 				)
-
 	return frappe.db.sql(query, tuple([txt, txt, start, page_len]))
 
 
