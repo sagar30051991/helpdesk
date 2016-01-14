@@ -1,9 +1,11 @@
-{% block title %}<center>Raise Issue</center>{% endblock %}
+{% extends "templates/web.html" %}
+{% block title %} Raise Issue {% endblock%}
+{% block hero %}<center><h3>Raise Issue</h3></center>{% endblock %}
 
 {% block content %}
 <br>
 <div class="row">
-  <div class="col-xs-4" align="right">Raised By</div>
+  <div class="col-xs-4" align="right">Email</div>
   <div class="col-xs-6">
     <div class="form-group">
       <input class="form-control" id="raised_by" type="text"/>
@@ -27,14 +29,6 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-xs-4" align="right">Extension Number</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="extension_number" type="text"/>
-    </div>
-  </div>
-</div>
-<div class="row">
   <div class="col-xs-4" align="right">Floor</div>
   <div class="col-xs-6">
     <div class="form-group">
@@ -51,6 +45,14 @@
   </div>
 </div>
 <div class="row">
+  <div class="col-xs-4" align="right">Extension Number</div>
+  <div class="col-xs-6">
+    <div class="form-group">
+      <input class="form-control" id="extension_number" type="text"/>
+    </div>
+  </div>
+</div>
+<div class="row">
   <div class="col-xs-4" align="right">Cabin / Workstation Number</div>
   <div class="col-xs-6">
     <div class="form-group">
@@ -62,7 +64,7 @@
   <div class="col-xs-4" align="right">Category</div>
   <div class="col-xs-6">
     <div class="form-group">
-      <input class="form-control" id="category" type="text"/>
+      <select class="form-control" id="category"></select>
     </div>
   </div>
 </div>
@@ -83,6 +85,8 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block script %}
 <script>
 	{% include "templates/includes/raise-issue.js" %}
 </script>

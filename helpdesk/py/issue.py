@@ -17,7 +17,8 @@ def get_permission_query_conditions(user):
 def get_subject_and_department_list():
 	return {
 		"departments": frappe.db.get_all("Department", fields="name as department"),
-		"subjects": frappe.db.get_all("Subject", fields="name as subject")
+		"subjects": frappe.db.get_all("Subject", fields="name as subject"),
+		"categories": frappe.db.get_all("Category", fields="name as category")
 	}
 
 @frappe.whitelist(allow_guest=True)

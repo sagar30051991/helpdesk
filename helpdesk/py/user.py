@@ -149,3 +149,12 @@ def validate_multiple_issue_name(names):
 		frappe.throw("Can not filter users more than one different departments detected")
 	else:
 		return departments[0]
+
+@frappe.whitelist()
+def get_user_details(user):
+	fields = ["floor", "extension_number", "wing", "cabin_or_workstation_number", "department"]
+	details = frappe.db.get_value("User", user, fields, as_dict=True)
+	if details:
+		return details
+	else:
+		return {}

@@ -13,6 +13,11 @@ get_subject_and_department_list = function(){
 					subj_opts += repl("<option>%(subject)s</option>", subj);
 				})
 
+				catg_opts = "<option></option>"
+				$.each(r.message.categories, function(idx, subj){
+					catg_opts += repl("<option>%(category)s</option>", subj);
+				})
+
 				dept_opts = "<option></option>"
 				$.each(departments, function(idx, dept){
 					dept_opts += repl("<option value=\"%(department)s\">%(department)s</option>", dept);
@@ -20,6 +25,7 @@ get_subject_and_department_list = function(){
 
 				$(subj_opts).appendTo($("#subject"));
 				$(dept_opts).appendTo($("#department"));
+				$(catg_opts).appendTo($("#category"));
 
 			}
 			else
@@ -58,7 +64,7 @@ raise_support_issue = function(){
 
 validate_inputs = function(){
 	missing_fields = []
-	fields_id = [	{id:"#raised_by", label:"Raised By"}, {id:"#subject", label:"Subject"}, 
+	fields_id = [	{id:"#raised_by", label:"Email"}, {id:"#subject", label:"Subject"}, 
 					{id:"#department", label:"Department"}, {id:"#department", label:"Department"},
 					{id:"#extension_number", label:"Extension Number"}, {id:"#floor", label:"Floor"},
 					{id:"#wing", label:"Wing"}, {id:"#cabin_or_workstation_number", label:"Cabin Or Workstation Number"},
@@ -85,20 +91,48 @@ validate_inputs = function(){
 
 }
 
-clear_fields = function(){
-	fields_id = [	"#raised_by", "#subject", "#department", 
-					"#description", "#extension_number", "#floor",
-					"#wing", "#cabin_or_workstation_number", "#category",
-					"#department"
-				]
+clear_fields = function(fields){
+	fields_id = [
+			"#raised_by", "#subject", "#department", 
+			"#description", "#extension_number", "#floor",
+			"#wing", "#cabin_or_workstation_number", "#category",
+			"#department"
+		]
+	
+	if(fields)
+		fields_id = fields
+	
 	$.each(fields_id, function(i, id){
 		$(id).val("")
 	})
 }
 
-$(document).ready(function() {
+fetch_and_render_user_details = function(){
+	return frappe.call({
+		method: "helpdesk.py.user.get_user_details",
+		freeze: true,
+		freeze_message: "Creating New Support Ticket",
+		args: { user: $("#raised_by").val().trim() },
+		callback: function(r){
+			if(r.message){
+				console.log(r.message)
+				$("#extension_number").val(r.message.extension_number || "")
+				$("#floor").val(r.message.floor || "")
+				$("#department").val(r.message.department || "")
+				$("#wing").val(r.message.wing || "")
+				$("#cabin_or_workstation_number").val(r.message.cabin_or_workstation_number  || "")
+			}
+			else
+				clear_fields(["#extension_number", "#floor", "#department", "#cabin_or_workstation_number", "#wing"])
+		}
+	});
+}
+
+frappe.ready(function() {
     get_subject_and_department_list()
-    
+	
+    // Binding events to fields
+
     $('.btn-raise').click(function() {
         if(validate_inputs()){
         	$(".btn-raise").prop("disabled", true);
@@ -109,4 +143,8 @@ $(document).ready(function() {
     $('.btn-clear').click(function() {
     	clear_fields()
     });
+
+    $('#raised_by').change(function(){
+    	fetch_and_render_user_details()
+    })
 });

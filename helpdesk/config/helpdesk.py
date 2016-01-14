@@ -24,6 +24,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Category",
+					"description": _("List Of Categories")
+				},
+				{
+					"type": "doctype",
 					"name": "Priority",
 					"description": _("Support Ticket Priority."),
 				},
