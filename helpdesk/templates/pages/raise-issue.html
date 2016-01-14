@@ -5,85 +5,56 @@
 {% block content %}
 <br>
 <div class="row">
-  <div class="col-xs-4" align="right">Email</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="raised_by" type="text"/>
+  <form role="form">
+    <div class="col-lg-6" style="padding:0px 30px 0px 150px;">
+      <div class="form-group">
+        <label for="raised_by">Email</label>
+        <input class="form-control" id="raised_by" placeholder="Enter Email Id" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <select class="form-control" id="subject"></select>
+      </div>
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select class="form-control" id="department"></select>
+      </div>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category"></select>
+      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right"> Subject</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <select class="form-control" id="subject"></select>
+    <div class="col-lg-6"  style="padding:0px 150px 0px 30px;">
+      <div class="form-group">
+        <label for="wing">Wing</label>
+        <input class="form-control" id="wing" placeholder="Enter the Wing" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="floor">Floor</label>
+        <input class="form-control" id="floor" placeholder="Enter the Floor" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="extension_number">Extension Number</label>
+        <input class="form-control" id="extension_number" placeholder="Enter the Extenstion No" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="cabin_or_workstation_number">Cabin Or Workstation Number</label>
+        <input class="form-control" id="cabin_or_workstation_number" placeholder="Enter the Cabin/Workstation No" type="text"/>
+      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right"> Department</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-		<select class="form-control" id="department"></select>
+    <div class="col-lg-12" style="padding: 0px 150px 0px 150px">
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" placeholder="Enter the detail description regarding issue"></textarea>
+      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Floor</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="floor" type="text"/>
+    <div class="col-lg-12" style="padding: 0px 150px 0px 150px" align="center">
+      <div class="form-group">
+        <button class="btn btn-primary btn-raise">Raise Support Ticket</button>
+        <button class="btn btn-primary btn-clear">Clear</button>
+      </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Wing</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="wing" type="text"/>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Extension Number</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="extension_number" type="text"/>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Cabin / Workstation Number</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <input class="form-control" id="cabin_or_workstation_number" type="text"/>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Category</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <select class="form-control" id="category"></select>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-4" align="right">Description</div>
-  <div class="col-xs-6">
-    <div class="form-group">
-      <textarea class="form-control" id="description"></textarea>
-    </div>
-  </div>
-</div>
-<div class="row" align="center">
-	<div class="col-xs-4" align="right"></div>
-  <div class="col-xs-6" align="center">
-    <div class="form-group">
-      <button class="btn btn-primary btn-raise">Raise Support Ticket</button>
-      <button class="btn btn-primary btn-clear">Clear</button>
-    </div>
-  </div>
+  </form>
 </div>
 {% endblock %}
 {% block script %}

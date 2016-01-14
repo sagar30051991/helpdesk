@@ -150,7 +150,7 @@ def validate_multiple_issue_name(names):
 	else:
 		return departments[0]
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_user_details(user):
 	fields = ["floor", "extension_number", "wing", "cabin_or_workstation_number", "department"]
 	details = frappe.db.get_value("User", user, fields, as_dict=True)

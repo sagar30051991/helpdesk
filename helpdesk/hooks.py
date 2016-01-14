@@ -98,9 +98,9 @@ scheduler_events = {
 	# "all": [
 	# 	"helpdesk.tasks.ticket_escallation"
 	# ],
-	# "daily": [
-	# 	"helpdesk.tasks.daily"
-	# ],
+	"daily": [
+		"helpdesk.tasks.daily_notifications"
+	],
 	# "weekly": [
 	# 	"helpdesk.tasks.weekly"
 	# ]

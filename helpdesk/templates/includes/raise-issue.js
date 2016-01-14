@@ -115,7 +115,6 @@ fetch_and_render_user_details = function(){
 		args: { user: $("#raised_by").val().trim() },
 		callback: function(r){
 			if(r.message){
-				console.log(r.message)
 				$("#extension_number").val(r.message.extension_number || "")
 				$("#floor").val(r.message.floor || "")
 				$("#department").val(r.message.department || "")

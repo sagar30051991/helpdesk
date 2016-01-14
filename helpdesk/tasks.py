@@ -351,3 +351,23 @@ def get_user_from_role(role, department=None, is_department=False):
     else:
         #TODO multiple user how to select ?
         return None
+
+def daily_notifications():
+    """
+        sent notifications to user if 
+        1 : ticket is open for more than 24 hrs
+        2 : ticket is assigned but not Closed in 24 hrs
+    """
+    tickets = frappe.db.get_all("Ticket Escalation History", filters=[["status", "!=", "Closed"]], fields=["*"])
+    for ticket in tickets:
+        # ticket is raised but not yet assigned
+        if raised_email_notification and not assigned_email_notification:
+            raised_time = ticket.raised_email_notification_datetime
+            if time_diff_in_hours(get_datetime().now(), raised_time) >= 24:
+                # send user notification mail
+                pass
+        elif assigned_email_notification and not status_closed_email_notification:
+            assigned_time = ticket.assigned_email_notification_datetime
+            if time_diff_in_hours(get_datetime().now(), assigned_time) >= 24:
+                # send the user notification mail
+                pass
