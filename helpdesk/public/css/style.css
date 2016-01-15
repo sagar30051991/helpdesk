@@ -1,0 +1,41 @@
+span.input-icon, span.input-help {
+  display: block;
+  position: relative;
+}
+
+.input-icon > input, .input-icon > textarea {
+  padding-left: 30px !important;
+  padding-right: 6px;
+}
+
+.input-icon.input-icon-right > input {
+  padding-left: 6px !important;
+  padding-right: 30px !important;
+}
+
+span.input-help > input {
+  padding-left: 30px;
+  padding-right: 6px;
+}
+
+.input-icon > [class*="icon-"], .input-icon > [class*="ti-"] {
+  bottom: 0;
+  color: #5e64ff;
+  display: inline-block;
+  left: 5px;
+  line-height: 35px;
+  padding: 0 3px;
+  position: absolute;
+  top: -1px;
+  z-index: 2;
+}
+
+.input-icon.input-icon-right > [class*="icon-"], .input-icon.input-icon-right > [class*="ti-"] {
+  left: auto;
+  right: 4px;
+}
+
+.alert-danger {
+	color: #5e64ff !important;
+	border-color: #5e64ff !important;
+}

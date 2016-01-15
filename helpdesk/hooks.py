@@ -18,7 +18,7 @@ app_version = "0.0.1"
 # app_include_js = "/assets/helpdesk/js/helpdesk.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/helpdesk/css/helpdesk.css"
+web_include_css = ["/assets/helpdesk/css/style.css"]
 # web_include_js = "/assets/helpdesk/js/helpdesk.js"
 
 # Home Pages

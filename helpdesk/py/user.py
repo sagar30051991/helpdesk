@@ -152,9 +152,12 @@ def validate_multiple_issue_name(names):
 
 @frappe.whitelist(allow_guest=True)
 def get_user_details(user):
+	from frappe.utils import get_fullname
+
 	fields = ["floor", "extension_number", "wing", "cabin_or_workstation_number", "department"]
 	details = frappe.db.get_value("User", user, fields, as_dict=True)
 	if details:
+		details.update({"user_fullname":get_fullname(user) or ""})
 		return details
 	else:
 		return {}

@@ -120,11 +120,28 @@ fetch_and_render_user_details = function(){
 				$("#department").val(r.message.department || "")
 				$("#wing").val(r.message.wing || "")
 				$("#cabin_or_workstation_number").val(r.message.cabin_or_workstation_number  || "")
+				set_greetings(r.message.user_fullname)
 			}
 			else
 				clear_fields(["#extension_number", "#floor", "#department", "#cabin_or_workstation_number", "#wing"])
 		}
 	});
+}
+
+set_greetings = function(user){
+	msg = "";
+	date = new Date();
+	hours = date.getHours();
+	min = date.getMinutes();
+
+	if(hours < 12)
+		msg = user? "Good Morning " + user : "Good Morning !!"
+	else if(hours > 12 || (hours == 12 && min > 0))
+		msg = user? "Good Afternoon " + user : "Good Afternoon !!"
+	else if(hours > 16)
+		msg = user? "Good Evening" + user : "Good Evening !!"
+
+	$("#greet").html(msg)
 }
 
 frappe.ready(function() {
@@ -146,4 +163,6 @@ frappe.ready(function() {
     $('#raised_by').change(function(){
     	fetch_and_render_user_details()
     })
+
+    set_greetings()
 });
