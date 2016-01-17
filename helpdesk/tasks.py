@@ -4,6 +4,7 @@ import pymssql
 from datetime import timedelta
 from utils import send_mail, create_scheduler_log
 from frappe.utils import get_datetime, time_diff_in_hours
+from frappe.utils import get_fullname
 
 def sync_db():
     """
@@ -358,16 +359,31 @@ def daily_notifications():
         1 : ticket is open for more than 24 hrs
         2 : ticket is assigned but not Closed in 24 hrs
     """
-    tickets = frappe.db.get_all("Ticket Escalation History", filters=[["status", "!=", "Closed"]], fields=["*"])
+    tickets = frappe.db.get_all("Ticket Escalation History", filters=[["status", "!=", "Closed"], ["status", "!=", "Deleted"]], fields=["*"])
     for ticket in tickets:
         # ticket is raised but not yet assigned
-        if raised_email_notification and not assigned_email_notification:
+        issue_doc = frappe.get_doc("Issue", ticket.ticket_id)
+        args = {
+            "user": get_fullname(issue_doc.raised_by) or "User",
+            "email": issue_doc.raised_by,
+            "action": "user_issue_notification",
+            "issue": issue_doc
+        }
+        if ticket.raised_email_notification and not ticket.assigned_email_notification:
             raised_time = ticket.raised_email_notification_datetime
             if time_diff_in_hours(get_datetime().now(), raised_time) >= 24:
                 # send user notification mail
-                pass
-        elif assigned_email_notification and not status_closed_email_notification:
+                msg = "Your support ticket {ticket_id} is pending our representative will \
+                check the issue as soon as possible".format(ticket_id=ticket.ticket_id)
+                
+                args.update({"msg":msg})
+                send_mail(args, "[HelpDesk] Daily Notifications")
+        elif ticket.assigned_email_notification and not ticket.status_closed_email_notification:
             assigned_time = ticket.assigned_email_notification_datetime
             if time_diff_in_hours(get_datetime().now(), assigned_time) >= 24:
                 # send the user notification mail
-                pass
+                msg = "Your support ticket {ticket_id} is assigned to our support representative \
+                and issue will be solved as soon as possble".format(ticket_id=ticket.ticket_id)
+                
+                args.update({"msg":msg})
+                send_mail(args, "[HelpDesk] Daily Notifications")
