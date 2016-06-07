@@ -3,8 +3,8 @@
   "address": null, 
   "banner_html": null, 
   "banner_image": null, 
-  "brand_html": "HelpDesk", 
-  "copyright": "HelpDesk", 
+  "brand_html": "KF", 
+  "copyright": "KF", 
   "disable_signup": 0, 
   "docstatus": 0, 
   "doctype": "Website Settings", 
@@ -15,21 +15,35 @@
   "google_plus_one": 0, 
   "head_html": null, 
   "hide_footer_signup": 0, 
-  "home_page": "", 
+  "home_page": "kf", 
   "home_page_is_products": 0, 
   "linked_in_share": 0, 
-  "modified": "2015-12-26 14:18:33.097264", 
+  "modified": "2016-06-03 15:06:45.711856", 
   "name": "Website Settings", 
   "sidebar_items": [], 
   "subdomain": null, 
   "title_prefix": null, 
   "top_bar_items": [
    {
-    "label": "Raise Issue", 
+    "label": "Contact", 
     "parent_label": null, 
     "right": 0, 
-    "target": "", 
-    "url": "raise-issue"
+    "target": null, 
+    "url": "/contact"
+   }, 
+   {
+    "label": "Blog", 
+    "parent_label": null, 
+    "right": 0, 
+    "target": null, 
+    "url": "/blog"
+   }, 
+   {
+    "label": "Products", 
+    "parent_label": null, 
+    "right": 0, 
+    "target": null, 
+    "url": "/products"
    }
   ], 
   "twitter_share": 0, 

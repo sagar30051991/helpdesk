@@ -134,8 +134,12 @@ def user_query(doctype, txt, searchfield, start, page_len, filters):
 					dept=dept,
 					key=searchfield,
 				)
-	return frappe.db.sql(query, tuple([txt, txt, start, page_len]))
+	
+	#below query mak
+	# return frappe.db.sql(query, tuple([txt, txt, start, page_len]))
+    
 
+	return frappe.db.sql('''select name from `tabUser`''')
 
 def validate_multiple_issue_name(names):
 	query = """SELECT DISTINCT department FROM `tabIssue` WHERE name IN ({names})""".format(
