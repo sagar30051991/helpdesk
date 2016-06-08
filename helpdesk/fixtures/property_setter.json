@@ -617,11 +617,11 @@
   "doctype": "Property Setter", 
   "doctype_or_field": "DocType", 
   "field_name": null, 
-  "modified": "2016-06-07 18:58:20.255053", 
-  "name": "Issue-_idx", 
-  "property": "_idx", 
-  "property_type": "Text", 
-  "value": "[\"subject_section\", \"naming_series\", \"city\", \"area\", \"facility\", \"building\", \"subject\", \"department\", \"problem_since_\", \"location_specification\", \"service_type\", \"cb00\", \"raised_by\", \"status\", \"category\", \"cabin_or_workstation_number\", \"floor\", \"wing\", \"extension_number\", \"fold\", \"section_break_7\", \"description\", \"column_break_9\", \"resolution_date\", \"first_responded_on\", \"additional_info\", \"lead\", \"contact\", \"column_break_16\", \"customer\", \"customer_name\", \"section_break_19\", \"resolution_details\", \"column_break1\", \"opening_date\", \"opening_time\", \"company\", \"content_type\", \"attachment\", \"email_id\"]"
+  "modified": "2016-06-08 10:06:11.123696", 
+  "name": "Issue-read_only_onload", 
+  "property": "read_only_onload", 
+  "property_type": "Check", 
+  "value": null
  }, 
  {
   "default_value": null, 
@@ -630,10 +630,36 @@
   "doctype": "Property Setter", 
   "doctype_or_field": "DocType", 
   "field_name": null, 
-  "modified": "2016-06-07 19:03:40.793609", 
-  "name": "Issue-read_only_onload", 
+  "modified": "2016-06-08 10:06:13.390186", 
+  "name": "Issue-_idx", 
+  "property": "_idx", 
+  "property_type": "Text", 
+  "value": "[\"subject_section\", \"naming_series\", \"city\", \"area\", \"facility\", \"building\", \"subject\", \"department\", \"problem_since_\", \"location_specification\", \"service_type\", \"cb00\", \"raised_by\", \"status\", \"category\", \"cabin_or_workstation_number\", \"floor\", \"description\", \"resolution_date\", \"resolution_details\", \"wing\", \"extension_number\", \"fold\", \"section_break_7\", \"column_break_9\", \"first_responded_on\", \"additional_info\", \"lead\", \"contact\", \"column_break_16\", \"customer\", \"customer_name\", \"section_break_19\", \"column_break1\", \"opening_date\", \"opening_time\", \"company\", \"content_type\", \"attachment\", \"email_id\"]"
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Conference Booking", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-06-08 10:09:36.779882", 
+  "name": "Conference Booking-read_only_onload", 
   "property": "read_only_onload", 
   "property_type": "Check", 
   "value": null
+ }, 
+ {
+  "default_value": null, 
+  "doc_type": "Conference Booking", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocType", 
+  "field_name": null, 
+  "modified": "2016-06-08 10:09:37.307450", 
+  "name": "Conference Booking-_idx", 
+  "property": "_idx", 
+  "property_type": "Text", 
+  "value": "[\"email_id\", \"city\", \"building\", \"location\", \"area\", \"conference\", \"facility\", \"col1\", \"date\", \"from_time\", \"to_time\", \"attendees\", \"agenda\"]"
  }
 ]
