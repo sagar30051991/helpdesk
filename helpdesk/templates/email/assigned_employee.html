@@ -1,0 +1,63 @@
+<p>Dear {{ user }},</p>
+	<p>{{ msg }}</p>
+<div align="center">
+	<p>
+			<table border="1px" width="100%" style="border-collapse: collapse;">
+			<thead>
+				<tr><th colspan="2">Ticket Details</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td width="40%" style="padding:5px;" align="right">Ticket ID : </td>
+					<td style="padding:5px;">{{ issue.get("name") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Subject : </td>
+					<td style="padding:5px;">{{ issue.get("subject") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Raised By : </td>
+					<td style="padding:5px;">{{ issue.get("owner") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Status : </td>
+					<td style="padding:5px;">{{ issue.get("status") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Department : </td>
+					<td style="padding:5px;">{{ issue.get("department") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Category : </td>
+					<td style="padding:5px;">{{ issue.get("category") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Extension Number : </td>
+					<td style="padding:5px;">{{ issue.get("extension_number") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Floor : </td>
+					<td style="padding:5px;">{{ issue.get("floor") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Wing : </td>
+					<td style="padding:5px;">{{ issue.get("wing") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Cabin Or Workstation Number : </td>
+					<td style="padding:5px;">{{ issue.get("cabin_or_workstation_number") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Opening Date : </td>
+					<td style="padding:5px;">{{ issue.get("opening_date") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Opening Time : </td>
+					<td style="padding:5px;">{{ issue.get("opening_time") }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</p>
+</div>
+<p>Thank you,<br>
+Team HelpDesk</p>

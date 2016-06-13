@@ -7,7 +7,7 @@
  "custom": 0, 
  "docstatus": 0, 
  "doctype": "DocType", 
- "document_type": "", 
+ "document_type": "Setup", 
  "fields": [
   {
    "allow_on_submit": 0, 
@@ -43,7 +43,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2016-06-06 13:34:18.839572", 
+ "modified": "2016-06-08 14:12:48.006459", 
  "modified_by": "Administrator", 
  "module": "HelpDesk", 
  "name": "Conference", 
