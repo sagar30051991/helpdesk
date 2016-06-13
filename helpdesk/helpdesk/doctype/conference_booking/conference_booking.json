@@ -7,7 +7,7 @@
  "custom": 0, 
  "docstatus": 0, 
  "doctype": "DocType", 
- "document_type": "", 
+ "document_type": "Document", 
  "fields": [
   {
    "allow_on_submit": 0, 
@@ -331,7 +331,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2016-06-06 14:34:20.202305", 
+ "modified": "2016-06-08 14:11:22.290695", 
  "modified_by": "Administrator", 
  "module": "HelpDesk", 
  "name": "Conference Booking", 

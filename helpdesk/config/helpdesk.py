@@ -9,13 +9,18 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "ToDo",
-					"description": _("ToDo"),
+					"name": "Issue",
+					"description": _("Support queries from employees."),
 				},
 				{
 					"type": "doctype",
-					"name": "Issue",
-					"description": _("Support queries from employees."),
+					"name": "Conference Booking",
+					"description": _("Conference Booking")
+				},
+				{
+					"type": "doctype",
+					"name": "ToDo",
+					"description": _("ToDo"),
 				},
 				{
 					"type": "doctype",
