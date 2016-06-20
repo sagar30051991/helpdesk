@@ -1,0 +1,63 @@
+<p>Dear {{ email_id }},</p>
+<div align="center">
+	<p>
+			<table border="1px" width="100%" style="border-collapse: collapse;">
+			<thead>
+				<tr><th colspan="2">Conference Booking Details</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td width="40%" style="padding:5px;" align="right">Date : </td>
+					<td style="padding:5px;">{{ conference_booking.get("date") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Created By : </td>
+					<td style="padding:5px;">{{ conference_booking.get("email_id") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">From Time : </td>
+					<td style="padding:5px;">{{ conference_booking.get("from_time") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">To Time By : </td>
+					<td style="padding:5px;">{{ conference_booking.get("to_time") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Conference : </td>
+					<td style="padding:5px;">{{ conference_booking.get("conference") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Building : </td>
+					<td style="padding:5px;">{{ conference_booking.get("building") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Location : </td>
+					<td style="padding:5px;">{{ conference_booking.get("location") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Area : </td>
+					<td style="padding:5px;">{{ conference_booking.get("area") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">City : </td>
+					<td style="padding:5px;">{{ conference_booking.get("city") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Facility : </td>
+					<td style="padding:5px;">{{ conference_booking.get("facility") }}</td>
+				</tr>
+
+				<tr>
+					<td style="padding:5px;" align="right">Agenda : </td>
+					<td style="padding:5px;">{{ conference_booking.get("agenda") }}</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;" align="right">Attendess : </td>
+					<td style="padding:5px;">{{ conference_booking.get("attendees") }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</p>
+</div>
+<p>Thank you,<br>
+Team HelpDesk</p>

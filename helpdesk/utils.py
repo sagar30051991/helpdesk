@@ -123,5 +123,6 @@ email_templates = {
 	"new_ticket": "templates/email/new_ticket_template.html",
     "escalate_ticket": "templates/email/escalate_ticket_template.html",
     "cant_escalate_tickets": "templates/email/cant_escalate_ticket_template.html",
-    "user_issue_notification": "templates/email/user_issue_raised.html"
+    "user_issue_notification": "templates/email/user_issue_raised.html",
+    "conference_notification": "templates/email/conference_book.html"
 }

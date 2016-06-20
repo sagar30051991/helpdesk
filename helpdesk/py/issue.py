@@ -13,12 +13,16 @@ def get_permission_query_conditions(user):
 		 	and tabToDo.reference_type = 'Issue' and tabToDo.reference_name=tabIssue.name))\
 		 """.format(user=frappe.db.escape(user))
 
+
+
+
+
 @frappe.whitelist(allow_guest=True)
 def get_subject_and_department_list():
 	return {
-		"departments": frappe.db.get_all("Department", fields="name as department"),
-		"subjects": frappe.db.get_all("Subject", fields="name as subject"),
-		"categories": frappe.db.get_all("Category", fields="name as category")
+		# "departments": frappe.db.get_all("Department", fields="name as department"),
+		"service_type": frappe.db.get_all("Service Type", fields="name as service_type")
+		# "categories": frappe.db.get_all("Service Type", fields="name as service_type")
 	}
 
 @frappe.whitelist(allow_guest=True)
@@ -31,13 +35,14 @@ def raise_issue(**args):
 	
 	issue = frappe.new_doc("Issue")
 	issue.raised_by = args.raised_by
-	issue.department = HTMLParser.HTMLParser().unescape(args.department)
+	issue.facility = HTMLParser.HTMLParser().unescape(args.facility)
 	issue.description = HTMLParser.HTMLParser().unescape(args.description)
-	issue.subject = HTMLParser.HTMLParser().unescape(args.subject)
-	issue.category = HTMLParser.HTMLParser().unescape(args.category)
+	issue.service_type = HTMLParser.HTMLParser().unescape(args.service_type)
+	issue.location = HTMLParser.HTMLParser().unescape(args.location)
+	issue.building = HTMLParser.HTMLParser().unescape(args.building)
 	issue.floor = HTMLParser.HTMLParser().unescape(args.floor)
-	issue.wing = HTMLParser.HTMLParser().unescape(args.wing)
-	issue.extension_number = HTMLParser.HTMLParser().unescape(args.extension_number)
-	issue.cabin_or_workstation_number = HTMLParser.HTMLParser().unescape(args.cabin_or_workstation_number)
+	issue.area = HTMLParser.HTMLParser().unescape(args.area)
+	issue.city = HTMLParser.HTMLParser().unescape(args.city)
+	issue.location_description = HTMLParser.HTMLParser().unescape(args.location_description)
 	issue.save(ignore_permissions=True)
 	return issue.name
