@@ -22,15 +22,30 @@ class ConferenceBooking(Document):
 	def validate(self):
 		self.notify_to_user()
 
-	        
+	 #fetch from after login details.       
 	def notify_to_user(self):
-		args = { "email_id": self.email_id,"conference_booking":{} }
-		
+
+		args = {
+			"email_id": self.email_id,
+			"conference_booking":{
+				"date": self.date,
+				"from_time": self.from_time,
+				"to_time": self.to_time,
+				"conference": self.conference,
+				"building": self.building,
+				"location": self.location,
+				"area": self.area,
+				"city": self.city,
+				"facility": self.facility,
+				"agenda": self.agenda,
+				"attendees" :self.attendees
+			}
+		}
 		template = email_templates.get("conference_notification")
-		# message = frappe.get_template(template).render(args)
-		# print args.get("email_id"),"argssssssssssssssssssssss"
-		# print message, "Adsaaaaaaaaaaaaaaaaaa"
-		
+		message = frappe.get_template(template).render(args)
+		print args.get("email_id"),"argssssssssssssssssssssss"
+		print message, "Adsaaaaaaaaaaaaaaaaaa"
+		print args
 		frappe.sendmail(recipients=args.get("email_id"),subject="subject", message= frappe.get_template(template).render(args))
 
 
@@ -44,7 +59,7 @@ def get_conference():
 	}
 
 @frappe.whitelist(allow_guest=True)
-def conference_booking(**args):
+def make_conference_booking(**args):
 	import json
 	import HTMLParser
 	print "in conference_booking"
@@ -54,20 +69,20 @@ def conference_booking(**args):
 	print HTMLParser.HTMLParser().unescape(args.city),"city city city"
 
 
-	conference_booking = frappe.new_doc("Conference Booking")
-	conference_booking.email_id = HTMLParser.HTMLParser().unescape(args.email_id)
-	conference_booking.city = HTMLParser.HTMLParser().unescape(args.city)
-	conference_booking.building = HTMLParser.HTMLParser().unescape(args.building)
-	conference_booking.location = HTMLParser.HTMLParser().unescape(args.location)
-	conference_booking.date = HTMLParser.HTMLParser().unescape(args.date)
-	conference_booking.from_time = HTMLParser.HTMLParser().unescape(args.from_time)
-	conference_booking.to_time = HTMLParser.HTMLParser().unescape(args.to_time)
-	conference_booking.attendees = HTMLParser.HTMLParser().unescape(args.attendess)
-	conference_booking.agenda = HTMLParser.HTMLParser().unescape(args.agenda)
-	conference_booking.conference = HTMLParser.HTMLParser().unescape(args.conference)
-	conference_booking.area = HTMLParser.HTMLParser().unescape(args.area)
-	conference_booking.facility = HTMLParser.HTMLParser().unescape(args.facility)
-	conference_booking.save(ignore_permissions=True)
-	return conference_booking.name
+	cb_obj = frappe.new_doc("Conference Booking")
+	cb_obj.email_id = HTMLParser.HTMLParser().unescape(args.email_id)
+	cb_obj.city = HTMLParser.HTMLParser().unescape(args.city)
+	cb_obj.building = HTMLParser.HTMLParser().unescape(args.building)
+	cb_obj.location = HTMLParser.HTMLParser().unescape(args.location)
+	cb_obj.date = HTMLParser.HTMLParser().unescape(args.date)
+	cb_obj.from_time = HTMLParser.HTMLParser().unescape(args.from_time)
+	cb_obj.to_time = HTMLParser.HTMLParser().unescape(args.to_time)
+	cb_obj.attendees = HTMLParser.HTMLParser().unescape(args.attendess_name)
+	cb_obj.agenda = HTMLParser.HTMLParser().unescape(args.agenda)
+	cb_obj.conference = HTMLParser.HTMLParser().unescape(args.conference)
+	cb_obj.area = HTMLParser.HTMLParser().unescape(args.area)
+	cb_obj.facility = HTMLParser.HTMLParser().unescape(args.facility)
+	cb_obj.save(ignore_permissions=True)
+	return cb_obj.name
 
 
