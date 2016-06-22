@@ -43,6 +43,9 @@ def raise_issue(**args):
 	issue.floor = HTMLParser.HTMLParser().unescape(args.floor)
 	issue.area = HTMLParser.HTMLParser().unescape(args.area)
 	issue.city = HTMLParser.HTMLParser().unescape(args.city)
-	issue.location_description = HTMLParser.HTMLParser().unescape(args.location_description)
+	# #write 
+	# issue.loc_desc = HTMLParser.HTMLParser().unescape(args.loc_desc)
+	# issue.subject = HTMLParser.HTMLParser().unescape(args.subject)
+
 	issue.save(ignore_permissions=True)
 	return issue.name

@@ -2,7 +2,7 @@
 
 get_conference = function(){
 	return frappe.call({
-		method: "helpdesk.py.conference_booking.get_conference",
+		method: "helpdesk.helpdesk.doctype.conference_booking.conference_booking.get_conference",
 		freeze: true,
 		freeze_message: "Fetching Subject and Department list",
 		callback: function(r){
@@ -31,7 +31,7 @@ conference_booking = function(){
 	console.log($("#email_id").val(),"email_id")
 	console.log($("#conference").val(),"conference")
 	return frappe.call({
-		method: "helpdesk.doctype.conference_booking.conference_booking",
+		method: "helpdesk.helpdesk.doctype.conference_booking.conference_booking.make_conference_booking",
 		freeze: true,
 		freeze_message: "Creating New conference",
 		args: {
@@ -45,7 +45,7 @@ conference_booking = function(){
 			date: $("#date").val(),
 			from_time: $("#from_time").val(),
 			to_time: $("#to_time").val(),
-			attendees: $("#attendees").val(),
+			attendess_name: $("#attendees").val(),
 			agenda: $("#agenda").val()
 		},
 		callback: function(r){
@@ -54,7 +54,7 @@ conference_booking = function(){
 			else
 				frappe.msgprint("Error while Saving conference Ticket, Please try after some time")
 
-			$(".btn-conference").prop("disabled", false);
+			/*$(".btn-conference").prop("disabled", false);*/
 			clear_fields();
 		}
 	});
@@ -67,13 +67,12 @@ validate_inputs = function(){
 					{id:"#area", label:"Area"}, {id:"#city", label:"City"},
 					{id:"#facility", label:"Facility"}, {id:"#date", label:"Date"},
 					{id:"#from_time", label:"From Time"},{id:"#to_time", label:"To Time"},
-					{id:"#attendees", label:"Attendees"},{id:"#agenda", label:"Agenda"}
+					{id:"#attendees", label:"attendees"},{id:"#agenda", label:"Agenda"}
 				]
 	$.each(fields_id, function(i, field){
 		//console.log($(field.id).val(),"valid_email valid_email")
 		if(!$(field.id).val())
 			missing_fields.push(field.label)
-			console.log(field.id,"hiiiiiiiii")
 	})
 
 	if(!missing_fields.length){
