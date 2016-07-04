@@ -89,7 +89,7 @@ helpdesk.DashboardGridView = Class.extend({
 			default:dateutil.get_today()});
 		this.status = this.page.add_field({fieldtype:"Select", fieldname: "status", 
 			label: __("Ticket Status"), options:["All", "Open", "Pending", "Closed"], default:"All"});
-		this.department = this.page.add_field({fieldtype:"Link", label:"Department",
+		this.department = this.page.add_field({fieldtype:"Link", label:"Category",
 			fieldname:"department", options:"Department", default:frappe.boot.department});
 	},
 	bind_filters:function(){
