@@ -15,10 +15,10 @@
   "google_plus_one": 0, 
   "head_html": null, 
   "hide_footer_signup": 0, 
-  "home_page": "new-indictranstech", 
+  "home_page": "", 
   "home_page_is_products": 0, 
   "linked_in_share": 0, 
-  "modified": "2016-06-23 12:57:09.165571", 
+  "modified": "2016-07-13 18:44:17.803365", 
   "name": "Website Settings", 
   "sidebar_items": [], 
   "subdomain": null, 
@@ -44,6 +44,20 @@
     "right": 0, 
     "target": null, 
     "url": "/products"
+   }, 
+   {
+    "label": "Raise Issue", 
+    "parent_label": null, 
+    "right": 1, 
+    "target": "", 
+    "url": "/raise-issue"
+   }, 
+   {
+    "label": "Conference Booking", 
+    "parent_label": "", 
+    "right": 1, 
+    "target": "", 
+    "url": "/conference-booking"
    }
   ], 
   "twitter_share": 0, 
