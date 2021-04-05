@@ -30,7 +30,7 @@ def sync_db():
                     for row in cursor:
                         # TODO save user details and roles
                         pass
-    except Exception, e:
+    except Exception e:
         import traceback
         error = e.message
         _traceback = traceback.print_exc()
