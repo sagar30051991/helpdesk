@@ -58,7 +58,6 @@ def create_update_escalation_history(issue_doc=None, issue_name=None, esc_name=N
 			the HelpDesk System, please check the Support Ticket details".format(name=issue_doc.name)
 		})
 		send_mail(args, "[HelpDesk][Issue Raised] HelpDesk Notifications")
-		print args.get("email")
 		
 		esc.raised_email_notification = 1
 		esc.raised_email_notification_datetime = get_datetime().now()
