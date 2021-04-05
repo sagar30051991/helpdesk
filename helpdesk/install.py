@@ -36,7 +36,7 @@ def create_escalation_settings_doc():
 	def append_rows(doc):
 		"""Append Escalation Hierarchy"""
 		doc.set("escalation_hierarchy",[])
-		for idx, ch_rec in hierarchy.iteritems():
+		for idx, ch_rec in hierarchy.items():
 			ch = doc.append("escalation_hierarchy", {})
 			ch.time = ch_rec.get("time")
 			ch.role = ch_rec.get("role")
