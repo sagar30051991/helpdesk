@@ -43,7 +43,6 @@ class ConferenceBooking(Document):
 		}
 		template = email_templates.get("conference_notification")
 		message = frappe.get_template(template).render(args)
-		print args.get("email_id"),"argssssssssssssssssssssss"
 		print message, "Adsaaaaaaaaaaaaaaaaaa"
 		print args
 		frappe.sendmail(recipients=args.get("email_id"),subject="subject", message= frappe.get_template(template).render(args))
